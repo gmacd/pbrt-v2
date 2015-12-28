@@ -4,18 +4,11 @@
 
 # common locations for the OpenEXR libraries; may need to be updated
 # for unusual installation locations
-HAVE_EXR=1
-EXR_INCLUDES=-I/usr/local/include/OpenEXR -I/usr/include/OpenEXR -I/opt/local/include/OpenEXR 
-EXR_LIBDIR=-L/usr/local/lib -L/opt/local/lib
-
 HAVE_LIBTIFF=0
 TIFF_INCLUDES=-I/usr/local/include -I/opt/local/include
 TIFF_LIBDIR=-L/usr/local/lib -L/opt/local/lib
 
 HAVE_DTRACE=0
-
-# remove -DPBRT_HAS_OPENEXR to build without OpenEXR support
-DEFS=-DPBRT_HAS_OPENEXR
 
 # 32 bit
 #MARCH=-m32 -msse2 -mfpmath=sse
@@ -26,7 +19,7 @@ MARCH=-m64
 # change this to -g3 for debug builds
 OPT=-O2
 # comment out this line to enable assertions at runtime
-DEFS += -DNDEBUG
+DEFS = -DNDEBUG
 
 #########################################################################
 # nothing below this line should need to be changed (usually)
@@ -48,26 +41,15 @@ else
     DEFS += -DPBRT_PROBES_NONE
 endif
 
-EXRLIBS=$(EXR_LIBDIR) -Bstatic -lIex -lIlmImf -lIlmThread -lImath -lIex -lHalf -Bdynamic
-ifeq ($(ARCH),Linux)
-  EXRLIBS += -lpthread
-endif
-ifeq ($(ARCH),OpenBSD)
-  EXRLIBS += -lpthread
-endif
-ifeq ($(ARCH),Darwin)
-  EXRLIBS += -lz
-endif
-
 CC=gcc
 CXX=g++
 LD=$(CXX) $(OPT) $(MARCH)
-INCLUDE=-I. -Icore $(EXR_INCLUDES) $(TIFF_INCLUDES)
+INCLUDE=-I. -Icore $(TIFF_INCLUDES)
 WARN=-Wall
 CWD=$(shell pwd)
 CXXFLAGS=$(OPT) $(MARCH) $(INCLUDE) $(WARN) $(DEFS)
 CCFLAGS=$(CXXFLAGS)
-LIBS=$(LEXLIB) $(EXR_LIBDIR) $(EXRLIBS) -lm 
+LIBS=$(LEXLIB) -lm 
 
 LIB_CSRCS=core/targa.c
 LIB_CXXSRCS  = $(wildcard core/*.cpp) core/pbrtlex.cpp core/pbrtparse.cpp
