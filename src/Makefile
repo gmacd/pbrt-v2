@@ -12,6 +12,7 @@ MARCH=-m64
 
 # change this to -g3 for debug builds
 OPT=-O2
+
 # comment out this line to enable assertions at runtime
 DEFS = -DNDEBUG
 
@@ -29,6 +30,13 @@ else
     LEBLIB = -lfl
 endif
 
+# PThreads - remove when moved to C++11 threading
+ifeq ($(ARCH),Linux)
+    PTHREADSLIB = -lpthread
+else
+    PTHREADSLIB =
+endif
+
 ifeq ($(HAVE_DTRACE),1)
     DEFS += -DPBRT_PROBES_DTRACE
 else
@@ -43,7 +51,7 @@ WARN=-Wall
 CWD=$(shell pwd)
 CXXFLAGS=$(OPT) $(MARCH) $(INCLUDE) $(WARN) $(DEFS)
 CCFLAGS=$(CXXFLAGS)
-LIBS=$(LEXLIB) -lm 
+LIBS=$(LEXLIB) -lm $(PTHREADSLIB)
 
 LIB_CSRCS=core/targa.c
 LIB_CXXSRCS  = $(wildcard core/*.cpp) core/pbrtlex.cpp core/pbrtparse.cpp
