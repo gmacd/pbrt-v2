@@ -233,11 +233,7 @@ ImageFilm *CreateImageFilm(const ParamSet &params, Filter *filter) {
             filename = PbrtOptions.imageFile;
     }
     if (filename == "")
-#ifdef PBRT_HAS_OPENEXR
         filename = "pbrt.exr";
-#else
-        filename = "pbrt.tga";
-#endif
 
     int xres = params.FindOneInt("xresolution", 640);
     int yres = params.FindOneInt("yresolution", 480);

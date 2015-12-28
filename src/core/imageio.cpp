@@ -40,6 +40,9 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
+#define TINYEXR_IMPLEMENTATION
+#include "3rdparty/tinyexr.h"
+
 // ImageIO Local Declarations
 static RGBSpectrum *ReadImageEXR(const string &name, int *width, int *height);
 static void WriteImageEXR(const string &name, float *pixels,
@@ -58,22 +61,25 @@ static RGBSpectrum *ReadImagePFM(const string &filename, int *xres, int *yres);
 RGBSpectrum *ReadImage(const string &name, int *width, int *height) {
     if (name.size() >= 5) {
         uint32_t suffixOffset = name.size() - 4;
-#ifdef PBRT_HAS_OPENEXR
+
         if (!strcmp(name.c_str() + suffixOffset, ".exr") ||
             !strcmp(name.c_str() + suffixOffset, ".EXR"))
              return ReadImageEXR(name, width, height);
-#endif // PBRT_HAS_OPENEXR
+
         if (!strcmp(name.c_str() + suffixOffset, ".tga") ||
             !strcmp(name.c_str() + suffixOffset, ".TGA"))
             return ReadImageTGA(name, width, height);
+        
         if (!strcmp(name.c_str() + suffixOffset, ".pfm") ||
             !strcmp(name.c_str() + suffixOffset, ".PFM"))
             return ReadImagePFM(name, width, height);
     }
+    
     Error("Unable to load image stored in format \"%s\" for filename \"%s\". "
           "Returning a constant grey image instead.",
           strrchr(name.c_str(), '.') ? (strrchr(name.c_str(), '.') + 1) : "(unknown)",
           name.c_str());
+    
     RGBSpectrum *ret = new RGBSpectrum[1];
     ret[0] = 0.5f;
     *width = *height = 1;
@@ -82,119 +88,155 @@ RGBSpectrum *ReadImage(const string &name, int *width, int *height) {
 
 
 void WriteImage(const string &name, float *pixels, float *alpha, int xRes,
-                int yRes, int totalXRes, int totalYRes, int xOffset, int yOffset) {
-    if (name.size() >= 5) {
+                int yRes, int totalXRes, int totalYRes, int xOffset, int yOffset)
+{
+    if (name.size() >= 5)
+    {
         uint32_t suffixOffset = name.size() - 4;
-#ifdef PBRT_HAS_OPENEXR
+
         if (!strcmp(name.c_str() + suffixOffset, ".exr") ||
             !strcmp(name.c_str() + suffixOffset, ".EXR")) {
              WriteImageEXR(name, pixels, alpha, xRes, yRes, totalXRes,
                            totalYRes, xOffset, yOffset);
              return;
         }
-#endif // PBRT_HAS_OPENEXR
+
         if (!strcmp(name.c_str() + suffixOffset, ".tga") ||
             !strcmp(name.c_str() + suffixOffset, ".TGA")) {
             WriteImageTGA(name, pixels, alpha, xRes, yRes, totalXRes,
                           totalYRes, xOffset, yOffset);
             return;
         }
+        
         if (!strcmp(name.c_str() + suffixOffset, ".pfm") ||
             !strcmp(name.c_str() + suffixOffset, ".PFM")) {
             WriteImagePFM(name, pixels, xRes, yRes);
             return;
         }
+        
         if (!strcmp(name.c_str() + suffixOffset, ".png") ||
             !strcmp(name.c_str() + suffixOffset, ".PNG")) {
             uint8_t *rgb8 = new uint8_t[3 * xRes * yRes];
             uint8_t *dst = rgb8;
-            for (int y = 0; y < yRes; ++y) {
-                for (int x = 0; x < xRes; ++x) {
+            for (int y = 0; y < yRes; ++y)
+            {
+                for (int x = 0; x < xRes; ++x)
+                {
 #define TO_BYTE(v) (uint8_t(Clamp(255.f * powf((v), 1.f/2.2f), 0.f, 255.f)))
+
                     dst[0] = TO_BYTE(pixels[3*(y*xRes+x)+2]);
                     dst[1] = TO_BYTE(pixels[3*(y*xRes+x)+1]);
                     dst[2] = TO_BYTE(pixels[3*(y*xRes+x)+0]);
+
 #undef TO_BYTE
+
                     dst += 3;
                 }
             }
+            
             if (stbi_write_png(name.c_str(), xRes, yRes, 3, rgb8,
                                3 * xRes) == 0)
                 Error("Error writing PNG \"%s\"", name.c_str());
+            
             delete[] rgb8;
             return;
         }
     }
+    
     Error("Can't determine image file type from suffix of filename \"%s\"",
           name.c_str());
 }
 
 
-#ifdef PBRT_HAS_OPENEXR
-#if defined(PBRT_IS_WINDOWS)
-#define hypotf hypot // For the OpenEXR headers
-#endif
-#include <ImfInputFile.h>
-#include <ImfRgbaFile.h>
-#include <ImfChannelList.h>
-#include <ImfFrameBuffer.h>
-#include <half.h>
-using namespace Imf;
-using namespace Imath;
-
 // EXR Function Definitions
-static RGBSpectrum *ReadImageEXR(const string &name, int *width, int *height) {
-    try {
-    RgbaInputFile file (name.c_str());
-    Box2i dw = file.dataWindow();
-    *width = dw.max.x - dw.min.x + 1;
-    *height = dw.max.y - dw.min.y + 1;
-    std::vector<Rgba> pixels(*width * *height);
-    file.setFrameBuffer(&pixels[0] - dw.min.x - dw.min.y * *width, 1, *width);
-    file.readPixels(dw.min.y, dw.max.y);
+static RGBSpectrum *ReadImageEXR(const string &name, int *width, int *height)
+{
+    float* srcPixels; // width * height * RGBA
+    const char* err;
 
-    RGBSpectrum *ret = new RGBSpectrum[*width * *height];
-    for (int i = 0; i < *width * *height; ++i) {
-        float frgb[3] = { pixels[i].r, pixels[i].g, pixels[i].b };
-        ret[i] = RGBSpectrum::FromRGB(frgb);
-    }
-    Info("Read EXR image %s (%d x %d)", name.c_str(), *width, *height);
-    return ret;
-    } catch (const std::exception &e) {
-        Error("Unable to read image file \"%s\": %s", name.c_str(),
-            e.what());
+    int ret = LoadEXR(&srcPixels, width, height, name.c_str(), &err);
+    if (ret != 0)
+    {
+        Error("Unable to read image file \"%s\": %s", name.c_str(), err);
         return NULL;
     }
+
+    int numPixels = *width * *height;
+    RGBSpectrum* outPixels = new RGBSpectrum[numPixels];
+    for (int i = 0; i < numPixels; ++i) {
+        float frgb[3] = { srcPixels[i*4], srcPixels[i*4+1], srcPixels[i*4+2] };
+        outPixels[i] = RGBSpectrum::FromRGB(frgb);
+    }
+
+    Info("Read EXR image %s (%d x %d)", name.c_str(), *width, *height);
+    
+    free(srcPixels);
+    
+    return outPixels;
 }
 
 
-static void WriteImageEXR(const string &name, float *pixels,
-        float *alpha, int xRes, int yRes,
-        int totalXRes, int totalYRes,
-        int xOffset, int yOffset) {
-    Rgba *hrgba = new Rgba[xRes * yRes];
-    for (int i = 0; i < xRes * yRes; ++i)
-        hrgba[i] = Rgba(pixels[3*i], pixels[3*i+1], pixels[3*i+2],
-                        alpha ? alpha[i]: 1.f);
+static void WriteImageEXR(
+    const string &name,
+    float *pixels,
+    float *alpha,
+    int xRes,
+    int yRes,
+    int totalXRes,
+    int totalYRes,
+    int xOffset,
+    int yOffset)
+{
+    // TODO support scaling, offsetting of output image.
+    EXRImage image;
+    InitEXRImage(&image);
 
-    Box2i displayWindow(V2i(0,0), V2i(totalXRes-1, totalYRes-1));
-    Box2i dataWindow(V2i(xOffset, yOffset), V2i(xOffset + xRes - 1, yOffset + yRes - 1));
+    int numPixels = xRes * yRes;
 
-    try {
-        RgbaOutputFile file(name.c_str(), displayWindow, dataWindow, WRITE_RGBA);
-        file.setFrameBuffer(hrgba - xOffset - yOffset * xRes, 1, xRes);
-        file.writePixels(yRes);
+    std::vector<float> rBuf, gBuf, bBuf;
+    rBuf.resize(numPixels);
+    gBuf.resize(numPixels);
+    bBuf.resize(numPixels);
+
+    for (int i = 0; i < numPixels; i++) {
+        rBuf[i] = pixels[3*i+0];
+        gBuf[i] = pixels[3*i+1];
+        bBuf[i] = pixels[3*i+2];
     }
-    catch (const std::exception &e) {
-        Error("Unable to write image file \"%s\": %s", name.c_str(),
-            e.what());
+
+    float* imagePtr[3];
+    imagePtr[0] = &(bBuf.at(0));
+    imagePtr[1] = &(gBuf.at(0));
+    imagePtr[2] = &(rBuf.at(0));
+
+    // Must be BGR(A) order, since most of EXR viewers expect this channel order.
+    const char* channel_names[] = {"B", "G", "R"}; // "B", "G", "R", "A" for RGBA image
+    image.channel_names = channel_names;
+    
+    image.images = (unsigned char**)imagePtr;
+    image.width = xRes;
+    image.height = yRes;
+    image.compression = TINYEXR_COMPRESSIONTYPE_ZIP;
+    image.num_channels = 3;
+
+    image.pixel_types = new int[image.num_channels];
+    image.requested_pixel_types = new int[image.num_channels];
+    
+    for (int i = 0; i < image.num_channels; i++) {
+      image.pixel_types[i] = TINYEXR_PIXELTYPE_FLOAT; // pixel type of input image
+      image.requested_pixel_types[i] = TINYEXR_PIXELTYPE_HALF; // pixel type of output image to be stored in .EXR
     }
 
-    delete[] hrgba;
+    const char* err;
+    int ret = SaveMultiChannelEXRToFile(&image, name.c_str(), &err);
+    if (ret != 0) {
+        Error("Unable to write image file \"%s\": %s", name.c_str(), err);
+    }
+    Info("Saved EXR image %s (%d x %d)\n", name.c_str(), image.width, image.height);
+
+    delete[] image.pixel_types;
+    delete[] image.requested_pixel_types;
 }
-
-
-#endif // PBRT_HAS_OPENEXR
 
 
 void WriteImageTGA(const string &name, float *pixels,
@@ -460,5 +502,3 @@ static bool WriteImagePFM(const string &filename, const float *rgb,
     fclose(fp);
     return false;
 }
-
-
