@@ -29,3 +29,7 @@ src/pbrt.vs*/*.user
 tmp/
 bin/
 lib/
+
+# Xcode folders
+src/pbrt.xcodeproj/project.xcworkspace/
+src/pbrt.xcodeproj/xcuserdata/
