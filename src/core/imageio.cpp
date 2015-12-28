@@ -59,20 +59,27 @@ static RGBSpectrum *ReadImagePFM(const string &filename, int *xres, int *yres);
 
 // ImageIO Function Definitions
 RGBSpectrum *ReadImage(const string &name, int *width, int *height) {
-    if (name.size() >= 5) {
+    if (name.size() >= 5)
+    {
         uint32_t suffixOffset = name.size() - 4;
 
         if (!strcmp(name.c_str() + suffixOffset, ".exr") ||
             !strcmp(name.c_str() + suffixOffset, ".EXR"))
-             return ReadImageEXR(name, width, height);
+        {
+            return ReadImageEXR(name, width, height);
+        }
 
         if (!strcmp(name.c_str() + suffixOffset, ".tga") ||
             !strcmp(name.c_str() + suffixOffset, ".TGA"))
+        {
             return ReadImageTGA(name, width, height);
+        }
         
         if (!strcmp(name.c_str() + suffixOffset, ".pfm") ||
             !strcmp(name.c_str() + suffixOffset, ".PFM"))
+        {
             return ReadImagePFM(name, width, height);
+        }
     }
     
     Error("Unable to load image stored in format \"%s\" for filename \"%s\". "
@@ -95,27 +102,31 @@ void WriteImage(const string &name, float *pixels, float *alpha, int xRes,
         uint32_t suffixOffset = name.size() - 4;
 
         if (!strcmp(name.c_str() + suffixOffset, ".exr") ||
-            !strcmp(name.c_str() + suffixOffset, ".EXR")) {
+            !strcmp(name.c_str() + suffixOffset, ".EXR"))
+        {
              WriteImageEXR(name, pixels, alpha, xRes, yRes, totalXRes,
                            totalYRes, xOffset, yOffset);
              return;
         }
 
         if (!strcmp(name.c_str() + suffixOffset, ".tga") ||
-            !strcmp(name.c_str() + suffixOffset, ".TGA")) {
+            !strcmp(name.c_str() + suffixOffset, ".TGA"))
+        {
             WriteImageTGA(name, pixels, alpha, xRes, yRes, totalXRes,
                           totalYRes, xOffset, yOffset);
             return;
         }
         
         if (!strcmp(name.c_str() + suffixOffset, ".pfm") ||
-            !strcmp(name.c_str() + suffixOffset, ".PFM")) {
+            !strcmp(name.c_str() + suffixOffset, ".PFM"))
+        {
             WriteImagePFM(name, pixels, xRes, yRes);
             return;
         }
         
         if (!strcmp(name.c_str() + suffixOffset, ".png") ||
-            !strcmp(name.c_str() + suffixOffset, ".PNG")) {
+            !strcmp(name.c_str() + suffixOffset, ".PNG"))
+        {
             uint8_t *rgb8 = new uint8_t[3 * xRes * yRes];
             uint8_t *dst = rgb8;
             for (int y = 0; y < yRes; ++y)

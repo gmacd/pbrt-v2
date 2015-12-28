@@ -440,6 +440,7 @@
 		08FB7795FE84155DC02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				B1D8EB67117030F200A8A49E /* core */,
 				B1D8EBD91170310E00A8A49E /* film */,
 				B1D8EBDC1170310E00A8A49E /* filters */,
 				B1D8EBE71170310E00A8A49E /* integrators */,
@@ -451,7 +452,6 @@
 				B1D8EC481170310E00A8A49E /* shapes */,
 				B1D8EC5D1170310E00A8A49E /* textures */,
 				B1D8EC761170310E00A8A49E /* volumes */,
-				B1D8EB67117030F200A8A49E /* core */,
 				B1D8EB5D117030E500A8A49E /* cameras */,
 				B1D8EB53117030DE00A8A49E /* accelerators */,
 			);
@@ -1008,6 +1008,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(DERIVED_FILES_DIR)/Yacc",
 					.,
+					3rdparty,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "";
@@ -1022,10 +1023,12 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PREPROCESSOR_DEFINITIONS = PBRT_PROBES_NONE;
 				HEADER_SEARCH_PATHS = (
 					"$(DERIVED_FILES_DIR)/Yacc",
 					.,
+					3rdparty,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "";
@@ -1097,6 +1100,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(DERIVED_FILES_DIR)/Yacc",
 					.,
+					3rdparty,
 				);
 				INSTALL_PATH = /usr/local/bin;
 				LIBRARY_SEARCH_PATHS = "";
