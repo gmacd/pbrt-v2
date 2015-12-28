@@ -2,12 +2,6 @@
 # user-configurable section
 ###########################################################################
 
-# common locations for the OpenEXR libraries; may need to be updated
-# for unusual installation locations
-HAVE_LIBTIFF=0
-TIFF_INCLUDES=-I/usr/local/include -I/opt/local/include
-TIFF_LIBDIR=-L/usr/local/lib -L/opt/local/lib
-
 HAVE_DTRACE=0
 
 # 32 bit
@@ -44,7 +38,7 @@ endif
 CC=gcc
 CXX=g++
 LD=$(CXX) $(OPT) $(MARCH)
-INCLUDE=-I. -Icore $(TIFF_INCLUDES)
+INCLUDE=-I. -Icore -I3rdparty
 WARN=-Wall
 CWD=$(shell pwd)
 CXXFLAGS=$(OPT) $(MARCH) $(INCLUDE) $(WARN) $(DEFS)
@@ -63,9 +57,6 @@ LIBOBJS += $(addprefix objs/, $(subst /,_,$(LIB_CXXSRCS:.cpp=.o)))
 HEADERS = $(wildcard */*.h)
 
 TOOLS = bin/bsdftest bin/exravg bin/exrdiff bin/obj2pbrt
-ifeq ($(HAVE_LIBTIFF),1)
-    TOOLS += bin/exrtotiff
-endif
 
 default: dirs bin/pbrt $(TOOLS)
 
@@ -160,10 +151,6 @@ bin/pbrt: objs/main_pbrt.o objs/libpbrt.a
 bin/%: objs/tools_%.o objs/libpbrt.a 
 	@echo "Linking $@"
 	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
-
-bin/exrtotiff: objs/tools_exrtotiff.o 
-	@echo "Linking $@"
-	@$(CXX) $(CXXFLAGS) -o $@ $^ $(TIFF_LIBDIR) -ltiff $(LIBS) 
 
 core/pbrtlex.cpp: core/pbrtlex.ll core/pbrtparse.cpp
 	@echo "Lex'ing pbrtlex.ll"
