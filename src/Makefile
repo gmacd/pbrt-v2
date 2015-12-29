@@ -53,7 +53,7 @@ CXXFLAGS=$(OPT) $(MARCH) $(INCLUDE) $(WARN) $(DEFS) -std=c++14
 CCFLAGS=$(OPT) $(MARCH) $(INCLUDE) $(WARN) $(DEFS)
 LIBS=$(LEXLIB) -lm $(PTHREADSLIB)
 
-LIB_CSRCS=core/targa.c
+LIB_CSRCS=3rdparty/targa.c
 LIB_CXXSRCS  = $(wildcard core/*.cpp) core/pbrtlex.cpp core/pbrtparse.cpp
 LIB_CXXSRCS += $(wildcard accelerators/*.cpp cameras/*.cpp film/*.cpp filters/*.cpp )
 LIB_CXXSRCS += $(wildcard integrators/*.cpp lights/*.cpp materials/*.cpp renderers/*.cpp )
@@ -98,7 +98,7 @@ objs/core_%.o: core/%.cpp
 	@echo "Building object $@"
 	@$(CXX) $(CXXFLAGS) -o $@ -c $<
 
-objs/core_%.o: core/%.c
+objs/3rdparty_%.o: 3rdparty/%.c
 	@echo "Building object $@"
 	@$(CC) $(CCFLAGS) -o $@ -c $<
 
