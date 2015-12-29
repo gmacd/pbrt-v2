@@ -43,14 +43,15 @@ struct Matrix4x4 {
     Matrix4x4() {
         m[0][0] = m[1][1] = m[2][2] = m[3][3] = 1.f;
         m[0][1] = m[0][2] = m[0][3] = m[1][0] =
-             m[1][2] = m[1][3] = m[2][0] = m[2][1] = m[2][3] =
-             m[3][0] = m[3][1] = m[3][2] = 0.f;
+            m[1][2] = m[1][3] = m[2][0] = m[2][1] = m[2][3] =
+            m[3][0] = m[3][1] = m[3][2] = 0.f;
     }
     Matrix4x4(float mat[4][4]);
     Matrix4x4(float t00, float t01, float t02, float t03,
               float t10, float t11, float t12, float t13,
               float t20, float t21, float t22, float t23,
               float t30, float t31, float t32, float t33);
+    
     bool operator==(const Matrix4x4 &m2) const {
         for (int i = 0; i < 4; ++i)
             for (int j = 0; j < 4; ++j)
@@ -63,7 +64,11 @@ struct Matrix4x4 {
                 if (m[i][j] != m2.m[i][j]) return true;
         return false;
     }
+
+    Vector Translation() const { return Vector(m[0][3], m[1][3], m[2][3]); }
+    
     friend Matrix4x4 Transpose(const Matrix4x4 &);
+    
     void Print(FILE *f) const {
         fprintf(f, "[ ");
         for (int i = 0; i < 4; ++i) {
@@ -76,6 +81,7 @@ struct Matrix4x4 {
         }
         fprintf(f, " ] ");
     }
+    
     static Matrix4x4 Mul(const Matrix4x4 &m1, const Matrix4x4 &m2) {
         Matrix4x4 r;
         for (int i = 0; i < 4; ++i)
@@ -86,7 +92,9 @@ struct Matrix4x4 {
                             m1.m[i][3] * m2.m[3][j];
         return r;
     }
+    
     friend Matrix4x4 Inverse(const Matrix4x4 &);
+    
     float m[4][4];
 };
 
@@ -110,7 +118,9 @@ public:
     Transform(const Matrix4x4 &mat, const Matrix4x4 &minv)
        : m(mat), mInv(minv) {
     }
+    
     void Print(FILE *f) const;
+    
     friend Transform Inverse(const Transform &t) {
         return Transform(t.mInv, t.m);
     }
@@ -131,6 +141,7 @@ public:
             }
         return false;
     }
+    
     bool IsIdentity() const {
         return (m.m[0][0] == 1.f && m.m[0][1] == 0.f &&
                 m.m[0][2] == 0.f && m.m[0][3] == 0.f &&
@@ -141,16 +152,20 @@ public:
                 m.m[3][0] == 0.f && m.m[3][1] == 0.f &&
                 m.m[3][2] == 0.f && m.m[3][3] == 1.f);
     }
+    
     const Matrix4x4 &GetMatrix() const { return m; }
     const Matrix4x4 &GetInverseMatrix() const { return mInv; }
+    
     bool HasScale() const {
         float la2 = (*this)(Vector(1,0,0)).LengthSquared();
         float lb2 = (*this)(Vector(0,1,0)).LengthSquared();
         float lc2 = (*this)(Vector(0,0,1)).LengthSquared();
+        
 #define NOT_ONE(x) ((x) < .999f || (x) > 1.001f)
         return (NOT_ONE(la2) || NOT_ONE(lb2) || NOT_ONE(lc2));
 #undef NOT_ONE
     }
+    
     inline Point operator()(const Point &pt) const;
     inline void operator()(const Point &pt, Point *ptrans) const;
     inline Vector operator()(const Vector &v) const;
@@ -162,8 +177,10 @@ public:
     inline RayDifferential operator()(const RayDifferential &r) const;
     inline void operator()(const RayDifferential &r, RayDifferential *rt) const;
     BBox operator()(const BBox &b) const;
+    
     Transform operator*(const Transform &t2) const;
     bool SwapsHandedness() const;
+    
 private:
     // Transform Private Data
     Matrix4x4 m, mInv;

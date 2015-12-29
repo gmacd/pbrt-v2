@@ -46,6 +46,7 @@ public:
     }
     bool HasNaNs() const { return isnan(x) || isnan(y) || isnan(z); }
     explicit Vector(const Point &p);
+    
 #ifndef NDEBUG
     // The default versions of these are fine for release builds; for debug
     // we define them so that we can add the Assert checks.
@@ -60,6 +61,7 @@ public:
         return *this;
     }
 #endif // !NDEBUG
+    
     Vector operator+(const Vector &v) const {
         Assert(!v.HasNaNs());
         return Vector(x + v.x, y + v.y, z + v.z);
@@ -133,6 +135,7 @@ public:
         : x(xx), y(yy), z(zz) {
         Assert(!HasNaNs());
     }
+    
 #ifndef NDEBUG
     Point(const Point &p) {
         Assert(!p.HasNaNs());
@@ -145,6 +148,7 @@ public:
         return *this;
     }
 #endif // !NDEBUG
+    
     Point operator+(const Vector &v) const {
         Assert(!v.HasNaNs());
         return Point(x + v.x, y + v.y, z + v.z);
@@ -204,6 +208,7 @@ public:
         Assert(i >= 0 && i <= 2);
         return (&x)[i];
     }
+    
     bool HasNaNs() const {
         return isnan(x) || isnan(y) || isnan(z);
     }
@@ -228,6 +233,7 @@ public:
         : x(xx), y(yy), z(zz) {
         Assert(!HasNaNs());
     }
+    
     Normal operator-() const {
         return Normal(-x, -y, -z);
     }
@@ -274,6 +280,7 @@ public:
         x *= inv; y *= inv; z *= inv;
         return *this;
     }
+    
     float LengthSquared() const { return x*x + y*y + z*z; }
     float Length() const        { return sqrtf(LengthSquared()); }
     
@@ -289,6 +296,7 @@ public:
         return *this;
     }
 #endif // !NDEBUG
+    
     explicit Normal(const Vector &v)
       : x(v.x), y(v.y), z(v.z) {
         Assert(!v.HasNaNs());
@@ -326,6 +334,7 @@ public:
         float start, float end = INFINITY)
         : o(origin), d(direction), mint(start), maxt(end),
           time(parent.time), depth(parent.depth+1) { }
+    
     Point operator()(float t) const { return o + d * t; }
     bool HasNaNs() const {
         return (o.HasNaNs() || d.HasNaNs() ||
@@ -358,6 +367,7 @@ public:
     explicit RayDifferential(const Ray &ray) : Ray(ray) {
         hasDifferentials = false;
     }
+    
     bool HasNaNs() const {
         return Ray::HasNaNs() ||
            (hasDifferentials && (rxOrigin.HasNaNs() || ryOrigin.HasNaNs() ||
@@ -389,8 +399,10 @@ public:
         pMin = Point(min(p1.x, p2.x), min(p1.y, p2.y), min(p1.z, p2.z));
         pMax = Point(max(p1.x, p2.x), max(p1.y, p2.y), max(p1.z, p2.z));
     }
+    
     friend BBox Union(const BBox &b, const Point &p);
     friend BBox Union(const BBox &b, const BBox &b2);
+    
     bool Overlaps(const BBox &b) const {
         bool x = (pMax.x >= b.pMin.x) && (pMin.x <= b.pMax.x);
         bool y = (pMax.y >= b.pMin.y) && (pMin.y <= b.pMax.y);
@@ -423,8 +435,10 @@ public:
         else
             return 2;
     }
+    
     const Point &operator[](int i) const;
     Point &operator[](int i);
+    
     Point Lerp(float tx, float ty, float tz) const {
         return Point(::Lerp(tx, pMin.x, pMax.x), ::Lerp(ty, pMin.y, pMax.y),
                      ::Lerp(tz, pMin.z, pMax.z));

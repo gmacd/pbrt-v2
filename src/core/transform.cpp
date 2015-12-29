@@ -30,7 +30,8 @@
  */
 
 
-// core/transform.cpp*
+#include <algorithm>
+
 #include "stdafx.h"
 #include "transform.h"
 #include "shape.h"
@@ -269,16 +270,34 @@ Transform LookAt(const Point &pos, const Point &look, const Vector &up) {
 }
 
 
-BBox Transform::operator()(const BBox &b) const {
+// Implementation based on 'Transforming Axis-Aligned Bounding Boxes'
+// by James Arvo, in Graphics Gems I.
+BBox Transform::operator()(const BBox &b) const
+{
     const Transform &M = *this;
-    BBox ret(        M(Point(b.pMin.x, b.pMin.y, b.pMin.z)));
-    ret = Union(ret, M(Point(b.pMax.x, b.pMin.y, b.pMin.z)));
-    ret = Union(ret, M(Point(b.pMin.x, b.pMax.y, b.pMin.z)));
-    ret = Union(ret, M(Point(b.pMin.x, b.pMin.y, b.pMax.z)));
-    ret = Union(ret, M(Point(b.pMin.x, b.pMax.y, b.pMax.z)));
-    ret = Union(ret, M(Point(b.pMax.x, b.pMax.y, b.pMin.z)));
-    ret = Union(ret, M(Point(b.pMax.x, b.pMin.y, b.pMax.z)));
-    ret = Union(ret, M(Point(b.pMax.x, b.pMax.y, b.pMax.z)));
+    auto& mat = M.GetMatrix();
+    auto t = mat.Translation();
+
+    BBox ret;
+    
+    for (int i = 0; i < 3; i++)
+    {
+        // Start with a degenerate interval at Ti to account for translation
+        ret.pMin[i] = t[i];
+        ret.pMax[i] = t[i];
+
+        // Add in extreme values obtained by computing the products of the
+        // mins and maxes with the elements of the i'th row of M.
+        for (int j = 0; j < 3; j++)
+        {
+            auto v1 = mat.m[i][j] * b.pMin[j];
+            auto v2 = mat.m[i][j] * b.pMax[j];
+            
+            ret.pMin[i] += std::min(v1, v2);
+            ret.pMax[i] += std::max(v1, v2);
+        }
+    }
+
     return ret;
 }
 
@@ -327,10 +346,7 @@ Transform Perspective(float fov, float n, float f) {
 // AnimatedTransform Method Definitions
 void AnimatedTransform::Decompose(const Matrix4x4 &m, Vector *T,
                                   Quaternion *Rquat, Matrix4x4 *S) {
-    // Extract translation _T_ from transformation matrix
-    T->x = m.m[0][3];
-    T->y = m.m[1][3];
-    T->z = m.m[2][3];
+    *T = m.Translation();
 
     // Compute new transformation matrix _M_ without translation
     Matrix4x4 M = m;

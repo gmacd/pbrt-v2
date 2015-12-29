@@ -24,6 +24,10 @@ TEST_CASE("Transform bounding box", "[transforms]")
     BBox boxA(Point(-3, -3, -3), Point(3, 3, 3));
     auto boxB = transform(boxA);
     
-    REQUIRE(boxB.pMin == Point(147, 117, 17));
-    REQUIRE(boxB.pMax == Point(153, 123, 23));
+    REQUIRE(boxB.pMin.x == 147);
+    REQUIRE(boxB.pMin.y == 117);
+    REQUIRE(boxB.pMin.z == 17);
+    REQUIRE(boxB.pMax.x == 153);
+    REQUIRE(boxB.pMax.y == 123);
+    REQUIRE(boxB.pMax.z == 23);
 }
