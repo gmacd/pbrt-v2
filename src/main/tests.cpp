@@ -7,14 +7,13 @@
 
 TEST_CASE("Transform identity", "[transforms]")
 {
-    // Example taken from killeroo scene
     Transform transform;
 
     BBox boxA(Point(-3, -3, -3), Point(3, 3, 3));
     auto boxB = transform(boxA);
     
-    REQUIRE(boxB.pMin == Point(-3, -3, -3));
-    REQUIRE(boxB.pMax == Point(3, 3, 3));
+    REQUIRE(boxB.pMin == boxA.pMin);
+    REQUIRE(boxB.pMax == boxA.pMax);
 }
 
 TEST_CASE("Transform bounding box", "[transforms]")
