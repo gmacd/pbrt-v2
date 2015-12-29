@@ -29,12 +29,8 @@
 
  */
 
-#if defined(_MSC_VER)
 #pragma once
-#endif
 
-#ifndef PBRT_CORE_TRANSFORM_H
-#define PBRT_CORE_TRANSFORM_H
 
 // core/transform.h*
 #include "pbrt.h"
@@ -325,7 +321,3 @@ private:
     Quaternion R[2];
     Matrix4x4 S[2];
 };
-
-
-
-#endif // PBRT_CORE_TRANSFORM_H

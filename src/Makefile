@@ -49,8 +49,8 @@ LD=$(CXX) $(OPT) $(MARCH)
 INCLUDE=-I. -Icore -I3rdparty
 WARN=-Wall
 CWD=$(shell pwd)
-CXXFLAGS=$(OPT) $(MARCH) $(INCLUDE) $(WARN) $(DEFS)
-CCFLAGS=$(CXXFLAGS)
+CXXFLAGS=$(OPT) $(MARCH) $(INCLUDE) $(WARN) $(DEFS) -std=c++14
+CCFLAGS=$(OPT) $(MARCH) $(INCLUDE) $(WARN) $(DEFS)
 LIBS=$(LEXLIB) -lm $(PTHREADSLIB)
 
 LIB_CSRCS=core/targa.c
@@ -66,11 +66,13 @@ HEADERS = $(wildcard */*.h)
 
 TOOLS = bin/bsdftest bin/exravg bin/exrdiff bin/obj2pbrt
 
-default: dirs bin/pbrt $(TOOLS)
+default: dirs bin/pbrt bin/tests $(TOOLS)
 
 bin/%: dirs
 
 pbrt: bin/pbrt
+
+tests: bin/tests
 
 dirs:
 	/bin/mkdir -p bin objs
@@ -155,6 +157,11 @@ objs/tools_%.o: tools/%.cpp
 bin/pbrt: objs/main_pbrt.o objs/libpbrt.a
 	@echo "Linking $@"
 	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+
+bin/tests: objs/main_tests.o objs/libpbrt.a
+	@echo "Linking $@"
+	@$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+
 
 bin/%: objs/tools_%.o objs/libpbrt.a 
 	@echo "Linking $@"

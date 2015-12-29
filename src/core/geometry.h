@@ -1,4 +1,3 @@
-
 /*
     pbrt source code Copyright(c) 1998-2012 Matt Pharr and Greg Humphreys.
 
@@ -29,12 +28,9 @@
 
  */
 
-#if defined(_MSC_VER)
-#pragma once
-#endif
 
-#ifndef PBRT_CORE_GEOMETRY_H
-#define PBRT_CORE_GEOMETRY_H
+#pragma once
+
 
 // core/geometry.h*
 #include "pbrt.h"
@@ -646,7 +642,3 @@ inline float SphericalPhi(const Vector &v) {
     float p = atan2f(v.y, v.x);
     return (p < 0.f) ? p + 2.f*M_PI : p;
 }
-
-
-
-#endif // PBRT_CORE_GEOMETRY_H
