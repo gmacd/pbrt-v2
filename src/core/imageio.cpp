@@ -43,22 +43,28 @@
 #define TINYEXR_IMPLEMENTATION
 #include "3rdparty/tinyexr.h"
 
-// ImageIO Local Declarations
+
+enum ImageType { ImageUnknown = 0, ImageExr, ImageTga, ImagePfm, ImagePng };
+    
+
 static RGBSpectrum *ReadImageEXR(const string &name, int *width, int *height);
 static void WriteImageEXR(const string &name, float *pixels,
         float *alpha, int xRes, int yRes,
         int totalXRes, int totalYRes,
         int xOffset, int yOffset);
-static void WriteImageTGA(const string &name, float *pixels,
-        float *alpha, int xRes, int yRes,
-        int totalXRes, int totalYRes,
-        int xOffset, int yOffset);
+static void WriteImage(const string &name, ImageType imageType,
+                       float *pixels, float *alpha,
+                       int xRes, int yRes,
+                       int totalXRes, int totalYRes,
+                       int xOffset, int yOffset);
 static RGBSpectrum *ReadImageTGA(const string &name, int *w, int *h);
 static bool WriteImagePFM(const string &filename, const float *rgb, int xres, int yres);
 static RGBSpectrum *ReadImagePFM(const string &filename, int *xres, int *yres);
 
+
 // ImageIO Function Definitions
-RGBSpectrum *ReadImage(const string &name, int *width, int *height) {
+RGBSpectrum *ReadImage(const string &name, int *width, int *height)
+{
     if (name.size() >= 5)
     {
         uint32_t suffixOffset = name.size() - 4;
@@ -112,8 +118,8 @@ void WriteImage(const string &name, float *pixels, float *alpha, int xRes,
         if (!strcmp(name.c_str() + suffixOffset, ".tga") ||
             !strcmp(name.c_str() + suffixOffset, ".TGA"))
         {
-            WriteImageTGA(name, pixels, alpha, xRes, yRes, totalXRes,
-                          totalYRes, xOffset, yOffset);
+            WriteImage(name, ImageTga, pixels, alpha, xRes, yRes, totalXRes,
+                       totalYRes, xOffset, yOffset);
             return;
         }
         
@@ -127,29 +133,9 @@ void WriteImage(const string &name, float *pixels, float *alpha, int xRes,
         if (!strcmp(name.c_str() + suffixOffset, ".png") ||
             !strcmp(name.c_str() + suffixOffset, ".PNG"))
         {
-            uint8_t *rgb8 = new uint8_t[3 * xRes * yRes];
-            uint8_t *dst = rgb8;
-            for (int y = 0; y < yRes; ++y)
-            {
-                for (int x = 0; x < xRes; ++x)
-                {
-#define TO_BYTE(v) (uint8_t(Clamp(255.f * powf((v), 1.f/2.2f), 0.f, 255.f)))
-
-                    dst[0] = TO_BYTE(pixels[3*(y*xRes+x)+2]);
-                    dst[1] = TO_BYTE(pixels[3*(y*xRes+x)+1]);
-                    dst[2] = TO_BYTE(pixels[3*(y*xRes+x)+0]);
-
-#undef TO_BYTE
-
-                    dst += 3;
-                }
-            }
-            
-            if (stbi_write_png(name.c_str(), xRes, yRes, 3, rgb8,
-                               3 * xRes) == 0)
-                Error("Error writing PNG \"%s\"", name.c_str());
-            
-            delete[] rgb8;
+            WriteImage(name, ImagePng, pixels, alpha,
+                       xRes, yRes, totalXRes,
+                       totalYRes, xOffset, yOffset);
             return;
         }
     }
@@ -250,33 +236,50 @@ static void WriteImageEXR(
 }
 
 
-void WriteImageTGA(const string &name, float *pixels,
-                   float *alpha, int xRes, int yRes,
-                   int totalXRes, int totalYRes,
-                   int xOffset, int yOffset)
+void WriteImage(const string &name, ImageType imageType,
+                float *pixels, float *alpha,
+                int xRes, int yRes,
+                int totalXRes, int totalYRes,
+                int xOffset, int yOffset)
 {
-    // Reformat to BGR layout.
-    uint8_t *outBuf = new uint8_t[3 * xRes * yRes];
-    uint8_t *dst = outBuf;
-    for (int y = 0; y < yRes; ++y) {
-        for (int x = 0; x < xRes; ++x) {
+    uint8_t* rgb8 = new uint8_t[3 * xRes * yRes];
+    uint8_t* dst = rgb8;
+    for (int y = 0; y < yRes; ++y)
+    {
+        for (int x = 0; x < xRes; ++x)
+        {
 #define TO_BYTE(v) (uint8_t(Clamp(255.f * powf((v), 1.f/2.2f), 0.f, 255.f)))
             dst[0] = TO_BYTE(pixels[3*(y*xRes+x)+2]);
             dst[1] = TO_BYTE(pixels[3*(y*xRes+x)+1]);
             dst[2] = TO_BYTE(pixels[3*(y*xRes+x)+0]);
+#undef TO_BYTE
+            
             dst += 3;
         }
     }
 
-    tga_result result;
-    if ((result = tga_write_bgr(name.c_str(), outBuf, xRes, yRes, 24)) != TGA_NOERR)
-        Error("Unable to write output file \"%s\" (%s)", name.c_str(),
-              tga_error(result));
+    switch (imageType)
+    {
+    case ImagePng:
+        if (!stbi_write_png(name.c_str(), xRes, yRes, 3, rgb8, 3 * xRes))
+        {
+            Error("Error writing PNG \"%s\"", name.c_str());
+        }
+        break;
 
-    delete[] outBuf;
+    case ImageTga:
+        if (!stbi_write_tga(name.c_str(), xRes, yRes, 3, rgb8))
+        {
+            Error("Error writing PNG \"%s\"", name.c_str());
+        }
+        break;
+
+    default:
+        Error("Unsupported image type %d", imageType);
+    }
+    
+    delete[] rgb8;
 }
-
-
 
 
 static RGBSpectrum *ReadImageTGA(const string &name, int *width, int *height)
