@@ -306,6 +306,8 @@ inline int Ceil2Int(float val) {
         Severe("Assertion \"%s\" failed in %s, line %d", \
                #expr, __FILE__, __LINE__))
 #endif // NDEBUG
+
+
 inline bool Quadratic(float A, float B, float C, float *t0, float *t1) {
     // Find quadratic discriminant
     float discrim = B * B - 4.f * A * C;
@@ -321,7 +323,6 @@ inline bool Quadratic(float A, float B, float C, float *t0, float *t1) {
     if (*t0 > *t1) swap(*t0, *t1);
     return true;
 }
-
 
 
 #endif // PBRT_CORE_PBRT_H
