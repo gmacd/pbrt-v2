@@ -61,7 +61,7 @@ public:
     Vector(const Vector &v)
     {
         Assert(!v.HasNaNs());
-        x = v.x; y = v.y; z = v.z;
+        x = v.x;  y = v.y;  z = v.z;
     }
 
     Vector(float4_t v):
@@ -77,7 +77,7 @@ public:
     Vector &operator=(const Vector &v)
     {
         Assert(!v.HasNaNs());
-        x = v.x; y = v.y; z = v.z;
+        x = v.x;  y = v.y;  z = v.z;
         return *this;
     }
 
@@ -94,7 +94,7 @@ public:
     Vector operator+(const Vector &v) const
     {
         Assert(!v.HasNaNs());
-#ifdef USE_SIMD
+#ifdef USE_SIMD_AVX
         return Vector(_mm_add_ps(_vec, v._vec));
 #else
         return Vector(x + v.x, y + v.y, z + v.z);
@@ -173,7 +173,7 @@ public:
         
     float LengthSquared() const
     {
-#ifdef USE_SIMD
+#ifdef USE_SIMD_AVX
         return _mm_cvtss_f32(_mm_dp_ps(_vec, _vec, 0x71));
 #else
         return x*x + y*y + z*z;
@@ -182,7 +182,7 @@ public:
     
     float Length() const
     {
-#ifdef USE_SIMD
+#ifdef USE_SIMD_AVX
         return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(_vec, _vec, 0x71)));
 #else
         return sqrtf(LengthSquared());
