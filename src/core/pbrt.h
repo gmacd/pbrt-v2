@@ -29,15 +29,12 @@
 
  */
 
+#pragma once
+
 #if defined(_MSC_VER)
 #define NOMINMAX 
-#pragma once
 #endif
 
-#ifndef PBRT_CORE_PBRT_H
-#define PBRT_CORE_PBRT_H
-
-// core/pbrt.h*
 
 #if defined(_WIN32) || defined(_WIN64)
 #define PBRT_IS_WINDOWS
@@ -107,6 +104,19 @@ typedef unsigned __int64 uint64_t;
 #define isnan _isnan
 #define isinf(f) (!_finite((f)))
 #endif
+
+
+// SIMD
+#include <xmmintrin.h>
+
+// Define DISABLE_SIMD to force disable any SIMD code
+// Undefined at bottom of file
+#if defined __AVX2__ && !defined DISABLE_SIMD
+#define USE_SIMD
+#endif
+
+typedef __m128 float4_t;
+
 
 // Global Macros
 #define ALLOCA(TYPE, COUNT) (TYPE *)alloca((COUNT) * sizeof(TYPE))
@@ -323,6 +333,3 @@ inline bool Quadratic(float A, float B, float C, float *t0, float *t1) {
     if (*t0 > *t1) swap(*t0, *t1);
     return true;
 }
-
-
-#endif // PBRT_CORE_PBRT_H

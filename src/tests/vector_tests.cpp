@@ -1,8 +1,5 @@
 #include "catch.hpp"
-
-#define DISABLE_SIMD
-#include "vector.h"
-
+#include "geometry.h"
 
 TEST_CASE("BasicOperations", "[vector]")
 {
