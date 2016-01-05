@@ -1,8 +1,6 @@
 #include "catch.hpp"
-
 #include "transform.h"
 #include "geometry.h"
-#include "vector.h"
 
 
 TEST_CASE("Transform identity", "[transforms]")

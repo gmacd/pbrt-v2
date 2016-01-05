@@ -28,13 +28,167 @@
 
  */
 
-
 #pragma once
 
 
-// core/geometry.h*
+#include <xmmintrin.h>
 #include "pbrt.h"
-#include "vector.h"
+
+
+class
+__attribute__ ((aligned(16)))
+Vector
+{
+public:
+    union
+    {
+        struct { float x, y, z; };
+        float4_t _vec;
+    };
+
+
+    Vector()
+    {
+        x = y = z = 0.f;
+    }
+    
+    Vector(float xx, float yy, float zz):
+        x(xx), y(yy), z(zz)
+    {
+        Assert(!HasNaNs());
+    }
+    
+    Vector(const Vector &v)
+    {
+        Assert(!v.HasNaNs());
+        x = v.x;  y = v.y;  z = v.z;
+    }
+
+    Vector(float4_t v):
+        _vec(v)
+    {
+    }
+
+    
+    explicit Vector(const Point &p);
+    explicit Vector(const Normal &n);
+
+    
+    Vector &operator=(const Vector &v)
+    {
+        Assert(!v.HasNaNs());
+        x = v.x;  y = v.y;  z = v.z;
+        return *this;
+    }
+
+    bool operator==(const Vector &v) const
+    {
+        return x == v.x && y == v.y && z == v.z;
+    }
+    
+    bool operator!=(const Vector &v) const
+    {
+        return x != v.x || y != v.y || z != v.z;
+    }
+    
+    Vector operator+(const Vector &v) const
+    {
+        Assert(!v.HasNaNs());
+#ifdef USE_SIMD_AVX
+        return Vector(_mm_add_ps(_vec, v._vec));
+#else
+        return Vector(x + v.x, y + v.y, z + v.z);
+#endif
+    }
+    
+    Vector& operator+=(const Vector &v)
+    {
+        Assert(!v.HasNaNs());
+        x += v.x; y += v.y; z += v.z;
+        return *this;
+    }
+    
+    Vector operator-(const Vector &v) const
+    {
+        Assert(!v.HasNaNs());
+        return Vector(x - v.x, y - v.y, z - v.z);
+    }
+    
+    Vector& operator-=(const Vector &v)
+    {
+        Assert(!v.HasNaNs());
+        x -= v.x; y -= v.y; z -= v.z;
+        return *this;
+    }
+    
+    Vector operator*(float f) const
+    {
+        return Vector(f*x, f*y, f*z);
+    }
+    
+    Vector &operator*=(float f)
+    {
+        Assert(!isnan(f));
+        x *= f; y *= f; z *= f;
+        return *this;
+    }
+    
+    Vector operator/(float f) const
+    {
+        Assert(f != 0);
+        float inv = 1.f / f;
+        return Vector(x * inv, y * inv, z * inv);
+    }
+    
+    Vector &operator/=(float f)
+    {
+        Assert(f != 0);
+        float inv = 1.f / f;
+        x *= inv; y *= inv; z *= inv;
+        return *this;
+    }
+    
+    Vector operator-() const
+    {
+        return Vector(-x, -y, -z);
+    }
+    
+    float operator[](int i) const
+    {
+        Assert(i >= 0 && i <= 2);
+        return (&x)[i];
+    }
+    
+    float &operator[](int i)
+    {
+        Assert(i >= 0 && i <= 2);
+        return (&x)[i];
+    }
+    
+
+    bool HasNaNs() const
+    {
+        return isnan(x) || isnan(y) || isnan(z);
+    }
+        
+    float LengthSquared() const
+    {
+#ifdef USE_SIMD_AVX
+        return _mm_cvtss_f32(_mm_dp_ps(_vec, _vec, 0x71));
+#else
+        return x*x + y*y + z*z;
+#endif
+    }
+    
+    float Length() const
+    {
+#ifdef USE_SIMD_AVX
+        return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(_vec, _vec, 0x71)));
+#else
+        return sqrtf(LengthSquared());
+#endif
+    }
+};
 
 
 class Point {
@@ -373,22 +527,41 @@ public:
 };
 
 
+inline Vector::Vector(const Point &p):
+    x(p.x), y(p.y), z(p.z)
+{
+    Assert(!HasNaNs());
+}
 
-// Geometry Inline Functions
-inline Vector operator*(float f, const Vector &v) { return v*f; }
-inline float Dot(const Vector &v1, const Vector &v2) {
+
+inline Vector::Vector(const Normal &n):
+    x(n.x), y(n.y), z(n.z)
+{
+    Assert(!n.HasNaNs());
+}
+
+
+inline Vector operator*(float f, const Vector &v)
+{
+    return v*f;
+}
+
+inline float Dot(const Vector &v1, const Vector &v2)
+{
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 }
 
 
-inline float AbsDot(const Vector &v1, const Vector &v2) {
+inline float AbsDot(const Vector &v1, const Vector &v2)
+{
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
     return fabsf(Dot(v1, v2));
 }
 
 
-inline Vector Cross(const Vector &v1, const Vector &v2) {
+inline Vector Cross(const Vector &v1, const Vector &v2)
+{
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
@@ -398,7 +571,8 @@ inline Vector Cross(const Vector &v1, const Vector &v2) {
 }
 
 
-inline Vector Cross(const Vector &v1, const Normal &v2) {
+inline Vector Cross(const Vector &v1, const Normal &v2)
+{
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
@@ -408,7 +582,8 @@ inline Vector Cross(const Vector &v1, const Normal &v2) {
 }
 
 
-inline Vector Cross(const Normal &v1, const Vector &v2) {
+inline Vector Cross(const Normal &v1, const Vector &v2)
+{
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
@@ -418,8 +593,13 @@ inline Vector Cross(const Normal &v1, const Vector &v2) {
 }
 
 
-inline Vector Normalize(const Vector &v) { return v / v.Length(); }
-inline void CoordinateSystem(const Vector &v1, Vector *v2, Vector *v3) {
+inline Vector Normalize(const Vector &v)
+{
+    return v / v.Length();
+}
+
+inline void CoordinateSystem(const Vector &v1, Vector *v2, Vector *v3)
+{
     if (fabsf(v1.x) > fabsf(v1.y)) {
         float invLen = 1.f / sqrtf(v1.x*v1.x + v1.z*v1.z);
         *v2 = Vector(-v1.z * invLen, 0.f, v1.x * invLen);
@@ -432,105 +612,121 @@ inline void CoordinateSystem(const Vector &v1, Vector *v2, Vector *v3) {
 }
 
 
-inline float Distance(const Point &p1, const Point &p2) {
+inline float Distance(const Point &p1, const Point &p2)
+{
     return (p1 - p2).Length();
 }
 
 
-inline float DistanceSquared(const Point &p1, const Point &p2) {
+inline float DistanceSquared(const Point &p1, const Point &p2)
+{
     return (p1 - p2).LengthSquared();
 }
 
 
-inline Point operator*(float f, const Point &p) {
+inline Point operator*(float f, const Point &p)
+{
     Assert(!p.HasNaNs());
     return p*f;
 }
 
 
-inline Normal operator*(float f, const Normal &n) {
+inline Normal operator*(float f, const Normal &n)
+{
     return Normal(f*n.x, f*n.y, f*n.z);
 }
 
 
-inline Normal Normalize(const Normal &n) {
+inline Normal Normalize(const Normal &n)
+{
     return n / n.Length();
 }
 
 
-inline float Dot(const Normal &n1, const Vector &v2) {
+inline float Dot(const Normal &n1, const Vector &v2)
+{
     Assert(!n1.HasNaNs() && !v2.HasNaNs());
     return n1.x * v2.x + n1.y * v2.y + n1.z * v2.z;
 }
 
 
-inline float Dot(const Vector &v1, const Normal &n2) {
+inline float Dot(const Vector &v1, const Normal &n2)
+{
     Assert(!v1.HasNaNs() && !n2.HasNaNs());
     return v1.x * n2.x + v1.y * n2.y + v1.z * n2.z;
 }
 
 
-inline float Dot(const Normal &n1, const Normal &n2) {
+inline float Dot(const Normal &n1, const Normal &n2)
+{
     Assert(!n1.HasNaNs() && !n2.HasNaNs());
     return n1.x * n2.x + n1.y * n2.y + n1.z * n2.z;
 }
 
 
-inline float AbsDot(const Normal &n1, const Vector &v2) {
+inline float AbsDot(const Normal &n1, const Vector &v2)
+{
     Assert(!n1.HasNaNs() && !v2.HasNaNs());
     return fabsf(n1.x * v2.x + n1.y * v2.y + n1.z * v2.z);
 }
 
 
-inline float AbsDot(const Vector &v1, const Normal &n2) {
+inline float AbsDot(const Vector &v1, const Normal &n2)
+{
     Assert(!v1.HasNaNs() && !n2.HasNaNs());
     return fabsf(v1.x * n2.x + v1.y * n2.y + v1.z * n2.z);
 }
 
 
-inline float AbsDot(const Normal &n1, const Normal &n2) {
+inline float AbsDot(const Normal &n1, const Normal &n2)
+{
     Assert(!n1.HasNaNs() && !n2.HasNaNs());
     return fabsf(n1.x * n2.x + n1.y * n2.y + n1.z * n2.z);
 }
 
 
-inline Normal Faceforward(const Normal &n, const Vector &v) {
+inline Normal Faceforward(const Normal &n, const Vector &v)
+{
     return (Dot(n, v) < 0.f) ? -n : n;
 }
 
 
-inline Normal Faceforward(const Normal &n, const Normal &n2) {
+inline Normal Faceforward(const Normal &n, const Normal &n2)
+{
     return (Dot(n, n2) < 0.f) ? -n : n;
 }
 
 
 
-inline Vector Faceforward(const Vector &v, const Vector &v2) {
+inline Vector Faceforward(const Vector &v, const Vector &v2)
+{
     return (Dot(v, v2) < 0.f) ? -v : v;
 }
 
 
-
-inline Vector Faceforward(const Vector &v, const Normal &n2) {
+inline Vector Faceforward(const Vector &v, const Normal &n2)
+{
     return (Dot(v, n2) < 0.f) ? -v : v;
 }
 
 
-inline const Point &BBox::operator[](int i) const {
+inline const Point &BBox::operator[](int i) const
+{
     Assert(i == 0 || i == 1);
     return (&pMin)[i];
 }
 
 
-
-inline Point &BBox::operator[](int i) {
+inline Point &BBox::operator[](int i)
+{
     Assert(i == 0 || i == 1);
     return (&pMin)[i];
 }
 
 
 inline Vector SphericalDirection(float sintheta,
-                                 float costheta, float phi) {
+                                 float costheta, float phi)
+{
     return Vector(sintheta * cosf(phi),
                   sintheta * sinf(phi),
                   costheta);
@@ -539,18 +735,21 @@ inline Vector SphericalDirection(float sintheta,
 
 inline Vector SphericalDirection(float sintheta, float costheta,
                                  float phi, const Vector &x,
-                                 const Vector &y, const Vector &z) {
+                                 const Vector &y, const Vector &z)
+{
     return sintheta * cosf(phi) * x +
            sintheta * sinf(phi) * y + costheta * z;
 }
 
 
-inline float SphericalTheta(const Vector &v) {
+inline float SphericalTheta(const Vector &v)
+{
     return acosf(Clamp(v.z, -1.f, 1.f));
 }
 
 
-inline float SphericalPhi(const Vector &v) {
+inline float SphericalPhi(const Vector &v)
+{
     float p = atan2f(v.y, v.x);
     return (p < 0.f) ? p + 2.f*M_PI : p;
 }
