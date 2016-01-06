@@ -71,7 +71,7 @@ void Heightfield::Refine(vector<Reference<Shape> > &refined) const {
     int ntris = 2*(nx-1)*(ny-1);
     refined.reserve(ntris);
     int *verts = new int[3*ntris];
-    Point *P = new Point[nx*ny];
+    Point3 *pts = new Point3[nx*ny];
     float *uvs = new float[2*nx*ny];
     int nverts = nx*ny;
     int x, y;
@@ -79,9 +79,9 @@ void Heightfield::Refine(vector<Reference<Shape> > &refined) const {
     int pos = 0;
     for (y = 0; y < ny; ++y) {
         for (x = 0; x < nx; ++x) {
-            P[pos].x = uvs[2*pos]   = (float)x / (float)(nx-1);
-            P[pos].y = uvs[2*pos+1] = (float)y / (float)(ny-1);
-            P[pos].z = z[pos];
+            pts[pos].x = uvs[2*pos]   = (float)x / (float)(nx-1);
+            pts[pos].y = uvs[2*pos+1] = (float)y / (float)(ny-1);
+            pts[pos].z = z[pos];
             ++pos;
         }
     }
@@ -104,9 +104,9 @@ void Heightfield::Refine(vector<Reference<Shape> > &refined) const {
     ParamSet paramSet;
     paramSet.AddInt("indices", verts, 3*ntris);
     paramSet.AddFloat("uv", uvs, 2 * nverts);
-    paramSet.AddPoint("P", P, nverts);
+    paramSet.AddPoint("P", pts, nverts);
     refined.push_back(CreateTriangleMeshShape(ObjectToWorld, WorldToObject, ReverseOrientation, paramSet));
-    delete[] P;
+    delete[] pts;
     delete[] uvs;
     delete[] verts;
 }

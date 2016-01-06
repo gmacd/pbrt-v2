@@ -76,9 +76,9 @@ void ParamSet::AddBool(const string &name, const bool *data, int nItems) {
 }
 
 
-void ParamSet::AddPoint(const string &name, const Point *data, int nItems) {
+void ParamSet::AddPoint(const string &name, const Point3 *data, int nItems) {
     ErasePoint(name);
-    ADD_PARAM_TYPE(Point, points);
+    ADD_PARAM_TYPE(Point3, points);
 }
 
 
@@ -331,12 +331,12 @@ bool ParamSet::FindOneBool(const string &name, bool d) const {
 }
 
 
-const Point *ParamSet::FindPoint(const string &name, int *nItems) const {
+const Point3 *ParamSet::FindPoint(const string &name, int *nItems) const {
     LOOKUP_PTR(points);
 }
 
 
-Point ParamSet::FindOnePoint(const string &name, const Point &d) const {
+Point3 ParamSet::FindOnePoint(const string &name, const Point3 &d) const {
     LOOKUP_ONE(points);
 }
 
@@ -485,7 +485,7 @@ string ParamSet::ToString() const {
     for (i = 0; i < points.size(); ++i) {
         char *bufp = buf;
         *bufp = '\0';
-        const Reference<ParamSetItem<Point> > &item = points[i];
+        const Reference<ParamSetItem<Point3> > &item = points[i];
         typeString = "point ";
         // Print _ParamSetItem_ declaration, determine how many to print
         int nPrint = item->nItems;

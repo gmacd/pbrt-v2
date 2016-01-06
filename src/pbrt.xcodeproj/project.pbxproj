@@ -420,6 +420,10 @@
 		BF7003A01C32B8BE00F3D698 /* targa.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = targa.c; path = 3rdparty/targa.c; sourceTree = "<group>"; };
 		BF7003A11C32B8BE00F3D698 /* targa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = targa.h; path = 3rdparty/targa.h; sourceTree = "<group>"; };
 		BF7003A21C32B8BE00F3D698 /* tinyexr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tinyexr.h; path = 3rdparty/tinyexr.h; sourceTree = "<group>"; };
+		BF83A6301C3DD6E9002CAC06 /* tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tests.cpp; sourceTree = "<group>"; };
+		BF83A6331C3DD705002CAC06 /* geometry_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = geometry_tests.cpp; path = tests/geometry_tests.cpp; sourceTree = "<group>"; };
+		BF83A6341C3DD705002CAC06 /* scratch_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scratch_tests.cpp; path = tests/scratch_tests.cpp; sourceTree = "<group>"; };
+		BF83A6351C3DD705002CAC06 /* transform_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = transform_tests.cpp; path = tests/transform_tests.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -461,6 +465,7 @@
 				B1D8EC761170310E00A8A49E /* volumes */,
 				B1D8EB5D117030E500A8A49E /* cameras */,
 				B1D8EB53117030DE00A8A49E /* accelerators */,
+				BF83A6391C3DD70E002CAC06 /* tests */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -668,6 +673,7 @@
 		B1D8EC131170310E00A8A49E /* main */ = {
 			isa = PBXGroup;
 			children = (
+				BF83A6301C3DD6E9002CAC06 /* tests.cpp */,
 				B1D8EC141170310E00A8A49E /* pbrt.cpp */,
 			);
 			path = main;
@@ -827,6 +833,16 @@
 				BF7003A21C32B8BE00F3D698 /* tinyexr.h */,
 			);
 			name = 3rdparty;
+			sourceTree = "<group>";
+		};
+		BF83A6391C3DD70E002CAC06 /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				BF83A6331C3DD705002CAC06 /* geometry_tests.cpp */,
+				BF83A6341C3DD705002CAC06 /* scratch_tests.cpp */,
+				BF83A6351C3DD705002CAC06 /* transform_tests.cpp */,
+			);
+			name = tests;
 			sourceTree = "<group>";
 		};
 		C6859E8C029090F304C91782 /* Documentation */ = {
@@ -1043,7 +1059,7 @@
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_MODEL_TUNING = G5;
-				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_OPTIMIZATION_LEVEL = 3;
 				GCC_PREPROCESSOR_DEFINITIONS = PBRT_PROBES_NONE;
 				HEADER_SEARCH_PATHS = (
 					"$(DERIVED_FILES_DIR)/Yacc",

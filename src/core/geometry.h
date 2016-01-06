@@ -31,7 +31,6 @@
 #pragma once
 
 
-#include <xmmintrin.h>
 #include "pbrt.h"
 
 
@@ -191,306 +190,492 @@ public:
 };
 
 
-class Point {
+class Point3
+{
 public:
-    // Point Public Methods
-    Point() { x = y = z = 0.f; }
-    Point(float xx, float yy, float zz)
-        : x(xx), y(yy), z(zz) {
+    float x, y, z;
+    
+    Point3()
+    {
+        x = y = z = 0.f;
+    }
+    
+    Point3(float xx, float yy, float zz):
+        x(xx), y(yy), z(zz)
+    {
+    }
+    
+    Point3(const Point3 &p)
+    {
+        x = p.x;  y = p.y;  z = p.z;
+    }
+    
+    explicit Point3(const Point &p);
+};
+
+
+class
+__attribute__ ((aligned(16)))
+Point
+{
+public:
+    union
+    {
+        struct { float x, y, z; };
+        float4_t _vec;
+    };
+
+    
+    Point()
+    {
+        x = y = z = 0.f;
+    }
+    
+    Point(float xx, float yy, float zz):
+        x(xx), y(yy), z(zz)
+    {
         Assert(!HasNaNs());
     }
     
-#ifndef NDEBUG
-    Point(const Point &p) {
+    Point(const Point &p)
+    {
         Assert(!p.HasNaNs());
-        x = p.x; y = p.y; z = p.z;
+        x = p.x;  y = p.y;  z = p.z;
     }
     
-    Point &operator=(const Point &p) {
+    explicit Point(const Point3 &p)
+    {
+        x = p.x;  y = p.y;  z = p.z;
+        Assert(!HasNaNs());
+    }
+
+    
+    Point &operator=(const Point &p)
+    {
         Assert(!p.HasNaNs());
-        x = p.x; y = p.y; z = p.z;
+        x = p.x;  y = p.y;  z = p.z;
         return *this;
     }
-#endif // !NDEBUG
     
-    Point operator+(const Vector &v) const {
+
+    bool operator==(const Point &p) const
+    {
+        return x == p.x && y == p.y && z == p.z;
+    }
+
+    bool operator!=(const Point &p) const
+    {
+        return x != p.x || y != p.y || z != p.z;
+    }
+
+
+    Point operator+(const Vector &v) const
+    {
         Assert(!v.HasNaNs());
         return Point(x + v.x, y + v.y, z + v.z);
     }
     
-    Point &operator+=(const Vector &v) {
+    Point &operator+=(const Vector &v)
+    {
         Assert(!v.HasNaNs());
         x += v.x; y += v.y; z += v.z;
         return *this;
     }
-    Vector operator-(const Point &p) const {
+    
+    Vector operator-(const Point &p) const
+    {
         Assert(!p.HasNaNs());
         return Vector(x - p.x, y - p.y, z - p.z);
     }
     
-    Point operator-(const Vector &v) const {
+    Point operator-(const Vector &v) const
+    {
         Assert(!v.HasNaNs());
         return Point(x - v.x, y - v.y, z - v.z);
     }
     
-    Point &operator-=(const Vector &v) {
+    Point &operator-=(const Vector &v)
+    {
         Assert(!v.HasNaNs());
         x -= v.x; y -= v.y; z -= v.z;
         return *this;
     }
-    Point &operator+=(const Point &p) {
+
+    Point &operator+=(const Point &p)
+    {
         Assert(!p.HasNaNs());
         x += p.x; y += p.y; z += p.z;
         return *this;
     }
-    Point operator+(const Point &p) const {
+
+    Point operator+(const Point &p) const
+    {
         Assert(!p.HasNaNs());
         return Point(x + p.x, y + p.y, z + p.z);
     }
-    Point operator* (float f) const {
+
+    Point operator* (float f) const
+    {
         return Point(f*x, f*y, f*z);
     }
-    Point &operator*=(float f) {
+
+    Point &operator*=(float f)
+    {
         x *= f; y *= f; z *= f;
         return *this;
     }
-    Point operator/ (float f) const {
+
+    Point operator/ (float f) const
+    {
         float inv = 1.f/f;
         return Point(inv*x, inv*y, inv*z);
     }
-    Point &operator/=(float f) {
+
+    Point &operator/=(float f)
+    {
         float inv = 1.f/f;
         x *= inv; y *= inv; z *= inv;
         return *this;
     }
-    float operator[](int i) const {
+
+    float operator[](int i) const
+    {
         Assert(i >= 0 && i <= 2);
         return (&x)[i];
     }
     
-    float &operator[](int i) {
+    float &operator[](int i)
+    {
         Assert(i >= 0 && i <= 2);
         return (&x)[i];
     }
+
     
-    bool HasNaNs() const {
+    bool HasNaNs() const
+    {
         return isnan(x) || isnan(y) || isnan(z);
     }
-
-    bool operator==(const Point &p) const {
-        return x == p.x && y == p.y && z == p.z;
-    }
-    bool operator!=(const Point &p) const {
-        return x != p.x || y != p.y || z != p.z;
-    }
-
-    // Point Public Data
-    float x, y, z;
 };
 
 
-class Normal {
+class
+//__attribute__ ((aligned(16)))
+Normal
+{
 public:
-    // Normal Public Methods
-    Normal() { x = y = z = 0.f; }
-    Normal(float xx, float yy, float zz)
-        : x(xx), y(yy), z(zz) {
+    /*union
+    {
+    struct {*/ float x, y, z; /*};
+        float4_t _vec;
+        };*/
+
+    
+    Normal()
+    {
+        x = y = z = 0.f;
+    }
+
+    Normal(float xx, float yy, float zz):
+        x(xx), y(yy), z(zz)
+    {
         Assert(!HasNaNs());
     }
+
+    Normal(const Normal &n)
+    {
+        Assert(!n.HasNaNs());
+        x = n.x; y = n.y; z = n.z;
+    }
+
+    explicit Normal(const Vector &v):
+        x(v.x), y(v.y), z(v.z)
+    {
+        Assert(!v.HasNaNs());
+    }
+
     
-    Normal operator-() const {
+    Normal &operator=(const Normal &n)
+    {
+        Assert(!n.HasNaNs());
+        x = n.x; y = n.y; z = n.z;
+        return *this;
+    }
+        
+    bool operator==(const Normal &n) const
+    {
+        return x == n.x && y == n.y && z == n.z;
+    }
+
+    bool operator!=(const Normal &n) const
+    {
+        return x != n.x || y != n.y || z != n.z;
+    }
+
+    Normal operator-() const
+    {
         return Normal(-x, -y, -z);
     }
-    Normal operator+ (const Normal &n) const {
+
+    Normal operator+ (const Normal &n) const
+    {
         Assert(!n.HasNaNs());
         return Normal(x + n.x, y + n.y, z + n.z);
     }
     
-    Normal& operator+=(const Normal &n) {
+    Normal& operator+=(const Normal &n)
+    {
         Assert(!n.HasNaNs());
         x += n.x; y += n.y; z += n.z;
         return *this;
     }
-    Normal operator- (const Normal &n) const {
+
+    Normal operator- (const Normal &n) const
+    {
         Assert(!n.HasNaNs());
         return Normal(x - n.x, y - n.y, z - n.z);
     }
     
-    Normal& operator-=(const Normal &n) {
+    Normal& operator-=(const Normal &n)
+    {
         Assert(!n.HasNaNs());
         x -= n.x; y -= n.y; z -= n.z;
         return *this;
     }
-    bool HasNaNs() const {
-        return isnan(x) || isnan(y) || isnan(z);
-    }
-    Normal operator*(float f) const {
+
+    Normal operator*(float f) const
+    {
         return Normal(f*x, f*y, f*z);
     }
     
-    Normal &operator*=(float f) {
+    Normal &operator*=(float f)
+    {
         x *= f; y *= f; z *= f;
         return *this;
     }
-    Normal operator/(float f) const {
+
+    Normal operator/(float f) const
+    {
         Assert(f != 0);
         float inv = 1.f/f;
         return Normal(x * inv, y * inv, z * inv);
     }
     
-    Normal &operator/=(float f) {
+    Normal &operator/=(float f)
+    {
         Assert(f != 0);
         float inv = 1.f/f;
         x *= inv; y *= inv; z *= inv;
         return *this;
     }
-    
-    float LengthSquared() const { return x*x + y*y + z*z; }
-    float Length() const        { return sqrtf(LengthSquared()); }
-    
-#ifndef NDEBUG
-    Normal(const Normal &n) {
-        Assert(!n.HasNaNs());
-        x = n.x; y = n.y; z = n.z;
-    }
-    
-    Normal &operator=(const Normal &n) {
-        Assert(!n.HasNaNs());
-        x = n.x; y = n.y; z = n.z;
-        return *this;
-    }
-#endif // !NDEBUG
-    
-    explicit Normal(const Vector &v)
-      : x(v.x), y(v.y), z(v.z) {
-        Assert(!v.HasNaNs());
-    }
-    float operator[](int i) const {
+
+    float operator[](int i) const
+    {
         Assert(i >= 0 && i <= 2);
         return (&x)[i];
     }
     
-    float &operator[](int i) {
+    float &operator[](int i)
+    {
         Assert(i >= 0 && i <= 2);
         return (&x)[i];
     }
 
-    bool operator==(const Normal &n) const {
-        return x == n.x && y == n.y && z == n.z;
-    }
-    bool operator!=(const Normal &n) const {
-        return x != n.x || y != n.y || z != n.z;
+    
+    bool HasNaNs() const
+    {
+        return isnan(x) || isnan(y) || isnan(z);
     }
 
-    // Normal Public Data
-    float x, y, z;
+    float LengthSquared() const
+    {
+        return x*x + y*y + z*z;
+    }
+
+    float Length() const
+    {
+        return sqrtf(LengthSquared());
+    }
 };
 
 
-class Ray {
+class
+//__attribute__ ((aligned(16)))
+Ray
+{
 public:
-    // Ray Public Methods
-    Ray() : mint(0.f), maxt(INFINITY), time(0.f), depth(0) { }
-    Ray(const Point &origin, const Vector &direction,
-        float start, float end = INFINITY, float t = 0.f, int d = 0)
-        : o(origin), d(direction), mint(start), maxt(end), time(t), depth(d) { }
-    Ray(const Point &origin, const Vector &direction, const Ray &parent,
-        float start, float end = INFINITY)
-        : o(origin), d(direction), mint(start), maxt(end),
-          time(parent.time), depth(parent.depth+1) { }
-    
-    Point operator()(float t) const { return o + d * t; }
-    bool HasNaNs() const {
-        return (o.HasNaNs() || d.HasNaNs() ||
-                isnan(mint) || isnan(maxt));
-    }
-
-    // Ray Public Data
     Point o;
     Vector d;
     mutable float mint, maxt;
     float time;
     int depth;
+
+
+    Ray():
+        mint(0.f), maxt(INFINITY), time(0.f), depth(0)
+    {
+    }
+    
+    Ray(const Point &origin, const Vector &direction,
+        float start, float end = INFINITY, float t = 0.f, int d = 0):
+        o(origin), d(direction), mint(start), maxt(end), time(t), depth(d)
+    {
+    }
+
+    Ray(const Point &origin, const Vector &direction, const Ray &parent,
+        float start, float end = INFINITY):
+        o(origin), d(direction), mint(start), maxt(end),
+        time(parent.time), depth(parent.depth+1)
+    {
+    }
+
+    
+    Point operator()(float t) const
+    {
+        return o + d * t;
+    }
+
+    
+    bool HasNaNs() const
+    {
+        return (o.HasNaNs() || d.HasNaNs() ||
+                isnan(mint) || isnan(maxt));
+    }
 };
 
 
-class RayDifferential : public Ray {
+class
+//__attribute__ ((aligned(16)))
+RayDifferential :
+    public Ray
+{
 public:
-    // RayDifferential Public Methods
-    RayDifferential() { hasDifferentials = false; }
-    RayDifferential(const Point &org, const Vector &dir, float start,
-        float end = INFINITY, float t = 0.f, int d = 0)
-            : Ray(org, dir, start, end, t, d) {
-        hasDifferentials = false;
-    }
-    RayDifferential(const Point &org, const Vector &dir, const Ray &parent,
-        float start, float end = INFINITY)
-            : Ray(org, dir, start, end, parent.time, parent.depth+1) {
-        hasDifferentials = false;
-    }
-    explicit RayDifferential(const Ray &ray) : Ray(ray) {
+    bool hasDifferentials;
+    Point rxOrigin, ryOrigin;
+    Vector rxDirection, ryDirection;
+
+    
+    RayDifferential()
+    {
         hasDifferentials = false;
     }
     
-    bool HasNaNs() const {
-        return Ray::HasNaNs() ||
-           (hasDifferentials && (rxOrigin.HasNaNs() || ryOrigin.HasNaNs() ||
-                                 rxDirection.HasNaNs() || ryDirection.HasNaNs()));
+    RayDifferential(const Point &org, const Vector &dir, float start,
+                    float end = INFINITY, float t = 0.f, int d = 0):
+        Ray(org, dir, start, end, t, d)
+    {
+        hasDifferentials = false;
     }
-    void ScaleDifferentials(float s) {
+
+    RayDifferential(const Point &org, const Vector &dir, const Ray &parent,
+                    float start, float end = INFINITY):
+        Ray(org, dir, start, end, parent.time, parent.depth+1)
+    {
+        hasDifferentials = false;
+    }
+
+    explicit RayDifferential(const Ray &ray):
+        Ray(ray)
+    {
+        hasDifferentials = false;
+    }
+
+    
+    bool HasNaNs() const
+    {
+        return Ray::HasNaNs() ||
+            (hasDifferentials && (rxOrigin.HasNaNs() || ryOrigin.HasNaNs() ||
+                                  rxDirection.HasNaNs() || ryDirection.HasNaNs()));
+    }
+
+    void ScaleDifferentials(float s)
+    {
         rxOrigin = o + (rxOrigin - o) * s;
         ryOrigin = o + (ryOrigin - o) * s;
         rxDirection = d + (rxDirection - d) * s;
         ryDirection = d + (ryDirection - d) * s;
     }
-
-    // RayDifferential Public Data
-    bool hasDifferentials;
-    Point rxOrigin, ryOrigin;
-    Vector rxDirection, ryDirection;
 };
 
 
-class BBox {
+class
+//__attribute__ ((aligned(16)))
+BBox
+{
 public:
-    // BBox Public Methods
-    BBox() {
+    Point pMin, pMax;
+
+    
+    BBox()
+    {
         pMin = Point( INFINITY,  INFINITY,  INFINITY);
         pMax = Point(-INFINITY, -INFINITY, -INFINITY);
     }
-    BBox(const Point &p) : pMin(p), pMax(p) { }
-    BBox(const Point &p1, const Point &p2) {
+
+    BBox(const Point &p):
+        pMin(p), pMax(p)
+    {
+    }
+
+    BBox(const Point &p1, const Point &p2)
+    {
         pMin = Point(min(p1.x, p2.x), min(p1.y, p2.y), min(p1.z, p2.z));
         pMax = Point(max(p1.x, p2.x), max(p1.y, p2.y), max(p1.z, p2.z));
     }
+
+    
+    bool operator==(const BBox &b) const
+    {
+        return b.pMin == pMin && b.pMax == pMax;
+    }
+
+    bool operator!=(const BBox &b) const
+    {
+        return b.pMin != pMin || b.pMax != pMax;
+    }
+
+    const Point &operator[](int i) const;
+    
+    Point &operator[](int i);
+
     
     friend BBox Union(const BBox &b, const Point &p);
     friend BBox Union(const BBox &b, const BBox &b2);
     
-    bool Overlaps(const BBox &b) const {
+    bool Overlaps(const BBox &b) const
+    {
         bool x = (pMax.x >= b.pMin.x) && (pMin.x <= b.pMax.x);
         bool y = (pMax.y >= b.pMin.y) && (pMin.y <= b.pMax.y);
         bool z = (pMax.z >= b.pMin.z) && (pMin.z <= b.pMax.z);
         return (x && y && z);
     }
-    bool Inside(const Point &pt) const {
+
+    bool Inside(const Point &pt) const
+    {
         return (pt.x >= pMin.x && pt.x <= pMax.x &&
                 pt.y >= pMin.y && pt.y <= pMax.y &&
                 pt.z >= pMin.z && pt.z <= pMax.z);
     }
-    void Expand(float delta) {
+
+    void Expand(float delta)
+    {
         pMin -= Vector(delta, delta, delta);
         pMax += Vector(delta, delta, delta);
     }
-    float SurfaceArea() const {
+
+    float SurfaceArea() const
+    {
         Vector d = pMax - pMin;
         return 2.f * (d.x * d.y + d.x * d.z + d.y * d.z);
     }
-    float Volume() const {
+
+    float Volume() const
+    {
         Vector d = pMax - pMin;
         return d.x * d.y * d.z;
     }
-    int MaximumExtent() const {
+
+    int MaximumExtent() const
+    {
         Vector diag = pMax - pMin;
         if (diag.x > diag.y && diag.x > diag.z)
             return 0;
@@ -499,31 +684,23 @@ public:
         else
             return 2;
     }
-    
-    const Point &operator[](int i) const;
-    Point &operator[](int i);
-    
-    Point Lerp(float tx, float ty, float tz) const {
+        
+    Point Lerp(float tx, float ty, float tz) const
+    {
         return Point(::Lerp(tx, pMin.x, pMax.x), ::Lerp(ty, pMin.y, pMax.y),
                      ::Lerp(tz, pMin.z, pMax.z));
     }
-    Vector Offset(const Point &p) const {
+
+    Vector Offset(const Point &p) const
+    {
         return Vector((p.x - pMin.x) / (pMax.x - pMin.x),
                       (p.y - pMin.y) / (pMax.y - pMin.y),
                       (p.z - pMin.z) / (pMax.z - pMin.z));
     }
+
     void BoundingSphere(Point *c, float *rad) const;
+    
     bool IntersectP(const Ray &ray, float *hitt0 = NULL, float *hitt1 = NULL) const;
-
-    bool operator==(const BBox &b) const {
-        return b.pMin == pMin && b.pMax == pMax;
-    }
-    bool operator!=(const BBox &b) const {
-        return b.pMin != pMin || b.pMax != pMax;
-    }
-
-    // BBox Public Data
-    Point pMin, pMax;
 };
 
 
@@ -538,6 +715,26 @@ inline Vector::Vector(const Normal &n):
     x(n.x), y(n.y), z(n.z)
 {
     Assert(!n.HasNaNs());
+}
+
+
+inline Point3::Point3(const Point &p)
+{
+    x = p.x;  y = p.y;  z = p.z;
+}
+
+
+inline const Point &BBox::operator[](int i) const
+{
+    Assert(i == 0 || i == 1);
+    return (&pMin)[i];
+}
+
+
+inline Point &BBox::operator[](int i)
+{
+    Assert(i == 0 || i == 1);
+    return (&pMin)[i];
 }
 
 
@@ -707,20 +904,6 @@ inline Vector Faceforward(const Vector &v, const Vector &v2)
 inline Vector Faceforward(const Vector &v, const Normal &n2)
 {
     return (Dot(v, n2) < 0.f) ? -v : v;
-}
-
-
-inline const Point &BBox::operator[](int i) const
-{
-    Assert(i == 0 || i == 1);
-    return (&pMin)[i];
-}
-
-
-inline Point &BBox::operator[](int i)
-{
-    Assert(i == 0 || i == 1);
-    return (&pMin)[i];
 }
 
 

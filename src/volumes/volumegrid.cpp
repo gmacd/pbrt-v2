@@ -64,8 +64,8 @@ VolumeGridDensity *CreateGridVolumeRegion(const Transform &volume2world,
     Spectrum sigma_s = params.FindOneSpectrum("sigma_s", 0.);
     float g = params.FindOneFloat("g", 0.);
     Spectrum Le = params.FindOneSpectrum("Le", 0.);
-    Point p0 = params.FindOnePoint("p0", Point(0,0,0));
-    Point p1 = params.FindOnePoint("p1", Point(1,1,1));
+    Point p0 = Point(params.FindOnePoint("p0", Point3(0,0,0)));
+    Point p1 = Point(params.FindOnePoint("p1", Point3(1,1,1)));
     int nitems;
     const float *data = params.FindFloat("density", &nitems);
     if (!data) {

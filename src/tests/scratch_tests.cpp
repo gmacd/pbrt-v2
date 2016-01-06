@@ -1,5 +1,4 @@
 #include "catch.hpp"
-#include <iostream>
 #include "geometry.h"
 
 TEST_CASE("Scratch", "[scratch]")

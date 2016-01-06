@@ -66,7 +66,7 @@ PointLight *CreatePointLight(const Transform &light2world,
         const ParamSet &paramSet) {
     Spectrum I = paramSet.FindOneSpectrum("I", Spectrum(1.0));
     Spectrum sc = paramSet.FindOneSpectrum("scale", Spectrum(1.0));
-    Point P = paramSet.FindOnePoint("from", Point(0,0,0));
+    Point P = Point(paramSet.FindOnePoint("from", Point3(0,0,0)));
     Transform l2w = Translate(Vector(P.x, P.y, P.z)) * light2world;
     return new PointLight(l2w, I * sc);
 }

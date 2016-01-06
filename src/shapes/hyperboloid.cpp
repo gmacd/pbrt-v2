@@ -258,8 +258,8 @@ float Hyperboloid::Area() const {
 #undef QUAD
 Shape *CreateHyperboloidShape(const Transform *o2w, const Transform *w2o,
         bool reverseOrientation, const ParamSet &params) {
-    Point p1 = params.FindOnePoint("p1", Point(0,0,0));
-    Point p2 = params.FindOnePoint("p2", Point(1,1,1));
+    Point p1 = Point(params.FindOnePoint("p1", Point3(0,0,0)));
+    Point p2 = Point(params.FindOnePoint("p2", Point3(1,1,1)));
     float phimax = params.FindOneFloat("phimax", 360);
     return new Hyperboloid(o2w, w2o, reverseOrientation, p1, p2, phimax);
 }

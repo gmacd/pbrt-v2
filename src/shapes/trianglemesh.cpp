@@ -40,7 +40,7 @@
 
 // TriangleMesh Method Definitions
 TriangleMesh::TriangleMesh(const Transform *o2w, const Transform *w2o,
-        bool ro, int nt, int nv, const int *vi, const Point *P,
+        bool ro, int nt, int nv, const int *vi, const Point3 *pts,
         const Normal *N, const Vector *S, const float *uv,
         const Reference<Texture<float> > &atex)
     : Shape(o2w, w2o, ro), alphaTexture(atex) {
@@ -67,8 +67,9 @@ TriangleMesh::TriangleMesh(const Transform *o2w, const Transform *w2o,
     else s = NULL;
 
     // Transform mesh vertices to world space
+    // (Converting from Point3 to Point)
     for (int i = 0; i < nverts; ++i)
-        p[i] = (*ObjectToWorld)(P[i]);
+        p[i] = (*ObjectToWorld)(Point(pts[i]));
 }
 
 
@@ -373,7 +374,7 @@ TriangleMesh *CreateTriangleMeshShape(const Transform *o2w, const Transform *w2o
         map<string, Reference<Texture<float> > > *floatTextures) {
     int nvi, npi, nuvi, nsi, nni;
     const int *vi = params.FindInt("indices", &nvi);
-    const Point *P = params.FindPoint("P", &npi);
+    const Point3 *pts = params.FindPoint("P", &npi);
     const float *uvs = params.FindFloat("uv", &nuvi);
     if (!uvs) uvs = params.FindFloat("st", &nuvi);
     bool discardDegnerateUVs = params.FindOneBool("discarddegenerateUVs", false);
@@ -388,7 +389,9 @@ TriangleMesh *CreateTriangleMeshShape(const Transform *o2w, const Transform *w2o
             Warning("More \"uv\"s provided than will be used for triangle "
                     "mesh.  (%d expcted, %d found)", 2*npi, nuvi);
     }
-    if (!vi || !P) return NULL;
+    if (!vi || !pts)
+        return NULL;
+    
     const Vector *S = params.FindVector("S", &nsi);
     if (S && nsi != npi) {
         Error("Number of \"S\"s for triangle mesh must match \"P\"s");
@@ -404,14 +407,19 @@ TriangleMesh *CreateTriangleMeshShape(const Transform *o2w, const Transform *w2o
         // give degenerate mappings; discard them if so
         const int *vp = vi;
         for (int i = 0; i < nvi; i += 3, vp += 3) {
-            float area = .5f * Cross(P[vp[0]]-P[vp[1]], P[vp[2]]-P[vp[1]]).Length();
-            if (area < 1e-7) continue; // ignore degenerate tris.
+            Point p0(pts[vp[0]]);
+            Point p1(pts[vp[1]]);
+            Point p2(pts[vp[2]]);
+            float area = .5f * Cross(p0-p1, p2-p1).Length();
+            if (area < 1e-7)
+                continue; // ignore degenerate tris.
             if ((uvs[2*vp[0]] == uvs[2*vp[1]] &&
                 uvs[2*vp[0]+1] == uvs[2*vp[1]+1]) ||
                 (uvs[2*vp[1]] == uvs[2*vp[2]] &&
                 uvs[2*vp[1]+1] == uvs[2*vp[2]+1]) ||
                 (uvs[2*vp[2]] == uvs[2*vp[0]] &&
-                uvs[2*vp[2]+1] == uvs[2*vp[0]+1])) {
+                uvs[2*vp[2]+1] == uvs[2*vp[0]+1]))
+            {
                 Warning("Degenerate uv coordinates in triangle mesh.  Discarding all uvs.");
                 uvs = NULL;
                 break;
@@ -436,7 +444,7 @@ TriangleMesh *CreateTriangleMeshShape(const Transform *o2w, const Transform *w2o
     }
     else if (params.FindOneFloat("alpha", 1.f) == 0.f)
         alphaTex = new ConstantTexture<float>(0.f);
-    return new TriangleMesh(o2w, w2o, reverseOrientation, nvi/3, npi, vi, P,
+    return new TriangleMesh(o2w, w2o, reverseOrientation, nvi/3, npi, vi, pts,
         N, S, uvs, alphaTex);
 }
 

@@ -11,7 +11,7 @@ HAVE_DTRACE=0
 MARCH=-march=native
 
 # change this to -g3 for debug builds
-OPT=-O2
+OPT=-O3
 
 # comment out this line to enable assertions at runtime
 DEFS = -DNDEBUG
@@ -46,6 +46,7 @@ endif
 CC=gcc
 CXX=g++
 LD=$(CXX) $(OPT) $(MARCH)
+
 INCLUDE=-I. -Icore -I3rdparty
 WARN=-Wall
 CWD=$(shell pwd)
@@ -53,7 +54,7 @@ CXXFLAGS=$(OPT) $(MARCH) $(INCLUDE) $(WARN) $(DEFS) -std=c++14
 CCFLAGS=$(OPT) $(MARCH) $(INCLUDE) $(WARN) $(DEFS)
 LIBS=$(LEXLIB) -lm $(PTHREADSLIB)
 
-LIB_CSRCS=3rdparty/targa.c
+LIB_CSRCS    = 3rdparty/targa.c
 LIB_CXXSRCS  = $(wildcard core/*.cpp) core/pbrtlex.cpp core/pbrtparse.cpp
 LIB_CXXSRCS += $(wildcard accelerators/*.cpp cameras/*.cpp film/*.cpp filters/*.cpp )
 LIB_CXXSRCS += $(wildcard integrators/*.cpp lights/*.cpp materials/*.cpp renderers/*.cpp )

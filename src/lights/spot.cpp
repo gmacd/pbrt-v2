@@ -81,8 +81,8 @@ SpotLight *CreateSpotLight(const Transform &l2w, const ParamSet &paramSet) {
     float coneangle = paramSet.FindOneFloat("coneangle", 30.);
     float conedelta = paramSet.FindOneFloat("conedeltaangle", 5.);
     // Compute spotlight world to light transformation
-    Point from = paramSet.FindOnePoint("from", Point(0,0,0));
-    Point to = paramSet.FindOnePoint("to", Point(0,0,1));
+    Point from = Point(paramSet.FindOnePoint("from", Point3(0,0,0)));
+    Point to = Point(paramSet.FindOnePoint("to", Point3(0,0,1)));
     Vector dir = Normalize(to - from);
     Vector du, dv;
     CoordinateSystem(dir, &du, &dv);

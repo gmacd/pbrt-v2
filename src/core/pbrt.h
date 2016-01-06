@@ -107,11 +107,11 @@ typedef unsigned __int64 uint64_t;
 
 
 // SIMD - AVX minimum
-#include <smmintrin.h>
 #include <xmmintrin.h>
+#include <smmintrin.h>
 
 // Define DISABLE_SIMD to force disable any SIMD code
-// Undefined at bottom of file
+//#define DISABLE_SIMD
 #if defined __AVX__ && !defined DISABLE_SIMD
 #define USE_SIMD_AVX
 #endif

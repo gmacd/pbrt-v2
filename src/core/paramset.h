@@ -57,7 +57,7 @@ public:
     void AddFloat(const string &, const float *, int nItems = 1);
     void AddInt(const string &, const int *, int nItems);
     void AddBool(const string &, const bool *, int nItems);
-    void AddPoint(const string &, const Point *, int nItems);
+    void AddPoint(const string &, const Point3 *, int nItems);
     void AddVector(const string &, const Vector *, int nItems);
     void AddNormal(const string &, const Normal *, int nItems);
     void AddString(const string &, const string *, int nItems);
@@ -79,7 +79,7 @@ public:
     float FindOneFloat(const string &, float d) const;
     int FindOneInt(const string &, int d) const;
     bool FindOneBool(const string &, bool d) const;
-    Point FindOnePoint(const string &, const Point &d) const;
+    Point3 FindOnePoint(const string &, const Point3 &d) const;
     Vector FindOneVector(const string &, const Vector &d) const;
     Normal FindOneNormal(const string &, const Normal &d) const;
     Spectrum FindOneSpectrum(const string &,
@@ -90,7 +90,7 @@ public:
     const float *FindFloat(const string &, int *nItems) const;
     const int *FindInt(const string &, int *nItems) const;
     const bool *FindBool(const string &, int *nItems) const;
-    const Point *FindPoint(const string &, int *nItems) const;
+    const Point3 *FindPoint(const string &, int *nItems) const;
     const Vector *FindVector(const string &, int *nItems) const;
     const Normal *FindNormal(const string &, int *nItems) const;
     const Spectrum *FindSpectrum(const string &, int *nItems) const;
@@ -104,7 +104,7 @@ private:
     vector<Reference<ParamSetItem<bool> > > bools;
     vector<Reference<ParamSetItem<int> > > ints;
     vector<Reference<ParamSetItem<float> > > floats;
-    vector<Reference<ParamSetItem<Point> > > points;
+    vector<Reference<ParamSetItem<Point3> > > points;
     vector<Reference<ParamSetItem<Vector> > > vectors;
     vector<Reference<ParamSetItem<Normal> > > normals;
     vector<Reference<ParamSetItem<Spectrum> > > spectra;
@@ -172,7 +172,7 @@ public:
     bool FindBool(const string &n, bool d) const {
            return geomParams.FindOneBool(n, materialParams.FindOneBool(n, d));
     }
-    Point FindPoint(const string &n, const Point &d) const {
+    Point3 FindPoint(const string &n, const Point3 &d) const {
            return geomParams.FindOnePoint(n, materialParams.FindOnePoint(n, d));
     }
     Vector FindVector(const string &n, const Vector &d) const {

@@ -67,8 +67,8 @@ DistantLight *CreateDistantLight(const Transform &light2world,
         const ParamSet &paramSet) {
     Spectrum L = paramSet.FindOneSpectrum("L", Spectrum(1.0));
     Spectrum sc = paramSet.FindOneSpectrum("scale", Spectrum(1.0));
-    Point from = paramSet.FindOnePoint("from", Point(0,0,0));
-    Point to = paramSet.FindOnePoint("to", Point(0,0,1));
+    Point from = Point(paramSet.FindOnePoint("from", Point3(0,0,0)));
+    Point to = Point(paramSet.FindOnePoint("to", Point3(0,0,1)));
     Vector dir = from-to;
     return new DistantLight(light2world, L * sc, dir);
 }

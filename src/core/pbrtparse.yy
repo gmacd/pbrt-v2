@@ -714,7 +714,7 @@ static void InitParamSet(ParamSet &ps, SpectrumType type) {
                 if ((nItems % 3) != 0)
                     Warning("Excess values given with point parameter \"%s\". "
                             "Ignoring last %d of them", cur_paramlist[i].name, nItems % 3);
-                ps.AddPoint(name, (Point *)data, nItems / 3);
+                ps.AddPoint(name, (Point3 *)data, nItems / 3);
             } else if (type == PARAM_TYPE_VECTOR) {
                 if ((nItems % 3) != 0)
                     Warning("Excess values given with vector parameter \"%s\". "
