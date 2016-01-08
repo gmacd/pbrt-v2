@@ -122,7 +122,6 @@ typedef unsigned __int64 uint64_t;
 
 typedef __m128 float4_t;
 
-
 // Global Macros
 #define ALLOCA(TYPE, COUNT) (TYPE *)alloca((COUNT) * sizeof(TYPE))
 

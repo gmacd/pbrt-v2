@@ -30,7 +30,6 @@
 
 #pragma once
 
-
 #include "pbrt.h"
 
 
@@ -42,7 +41,7 @@ public:
     union
     {
         struct { float x, y, z; };
-        float4_t _vec;
+        float4_t vec;
     };
 
 
@@ -64,7 +63,7 @@ public:
     }
 
     Vector(float4_t v):
-        _vec(v)
+        vec(v)
     {
     }
 
@@ -94,7 +93,7 @@ public:
     {
         Assert(!v.HasNaNs());
 #ifdef USE_SIMD_AVX
-        return Vector(_mm_add_ps(_vec, v._vec));
+        return Vector(_mm_add_ps(vec, v.vec));
 #else
         return Vector(x + v.x, y + v.y, z + v.z);
 #endif
@@ -103,7 +102,7 @@ public:
     Vector& operator+=(const Vector &v)
     {
         Assert(!v.HasNaNs());
-        x += v.x; y += v.y; z += v.z;
+        x += v.x;  y += v.y;  z += v.z;
         return *this;
     }
     
@@ -116,7 +115,7 @@ public:
     Vector& operator-=(const Vector &v)
     {
         Assert(!v.HasNaNs());
-        x -= v.x; y -= v.y; z -= v.z;
+        x -= v.x;  y -= v.y;  z -= v.z;
         return *this;
     }
     
@@ -128,7 +127,7 @@ public:
     Vector &operator*=(float f)
     {
         Assert(!isnan(f));
-        x *= f; y *= f; z *= f;
+        x *= f;  y *= f;  z *= f;
         return *this;
     }
     
@@ -143,7 +142,7 @@ public:
     {
         Assert(f != 0);
         float inv = 1.f / f;
-        x *= inv; y *= inv; z *= inv;
+        x *= inv;  y *= inv;  z *= inv;
         return *this;
     }
     
@@ -173,7 +172,7 @@ public:
     float LengthSquared() const
     {
 #ifdef USE_SIMD_AVX
-        return _mm_cvtss_f32(_mm_dp_ps(_vec, _vec, 0x71));
+        return _mm_cvtss_f32(_mm_dp_ps(vec, vec, 0x71));
 #else
         return x*x + y*y + z*z;
 #endif
@@ -182,7 +181,7 @@ public:
     float Length() const
     {
 #ifdef USE_SIMD_AVX
-        return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(_vec, _vec, 0x71)));
+        return _mm_cvtss_f32(_mm_sqrt_ss(_mm_dp_ps(vec, vec, 0x71)));
 #else
         return sqrtf(LengthSquared());
 #endif
@@ -366,7 +365,7 @@ public:
     union
     {
         struct { float x, y, z; };
-        float4_t _vec;
+        float4_t vec;
     };
 
     
@@ -741,7 +740,7 @@ inline float Dot(const Vector &v1, const Vector &v2)
 {
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
 #ifdef USE_SIMD_AVX
-    return _mm_cvtss_f32(_mm_dp_ps(v1._vec, v2._vec, 0x71));
+    return _mm_cvtss_f32(_mm_dp_ps(v1.vec, v2.vec, 0x71));
 #else
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 #endif
@@ -767,7 +766,7 @@ inline Vector Cross(const Vector &v1, const Vector &v2)
 {
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
 #ifdef USE_SIMD_AVX
-    return Cross(&v1._vec, &v2._vec);
+    return Cross(&v1.vec, &v2.vec);
 #else
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
@@ -782,7 +781,7 @@ inline Vector Cross(const Vector &v1, const Normal &v2)
 {
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
 #ifdef USE_SIMD_AVX
-    return Cross(&v1._vec, &v2._vec);
+    return Cross(&v1.vec, &v2.vec);
 #else
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
@@ -797,7 +796,7 @@ inline Vector Cross(const Normal &v1, const Vector &v2)
 {
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
 #ifdef USE_SIMD_AVX
-    return Cross(&v1._vec, &v2._vec);
+    return Cross(&v1.vec, &v2.vec);
 #else
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
@@ -862,8 +861,7 @@ inline float Dot(const Normal &n1, const Vector &v2)
 {
     Assert(!n1.HasNaNs() && !v2.HasNaNs());
 #ifdef USE_SIMD_AVX
-    return _mm_cvtss_f32(_mm_dp_ps(n1._vec, v2._vec, 0x71));
-    //return n1.x * v2.x + n1.y * v2.y + n1.z * v2.z;
+    return _mm_cvtss_f32(_mm_dp_ps(n1.vec, v2.vec, 0x71));
 #else
     return n1.x * v2.x + n1.y * v2.y + n1.z * v2.z;
 #endif
@@ -874,8 +872,7 @@ inline float Dot(const Vector &v1, const Normal &n2)
 {
     Assert(!v1.HasNaNs() && !n2.HasNaNs());
 #ifdef USE_SIMD_AVX
-    return _mm_cvtss_f32(_mm_dp_ps(v1._vec, n2._vec, 0x71));
-    //return v1.x * n2.x + v1.y * n2.y + v1.z * n2.z;
+    return _mm_cvtss_f32(_mm_dp_ps(v1.vec, n2.vec, 0x71));
 #else
     return v1.x * n2.x + v1.y * n2.y + v1.z * n2.z;
 #endif
@@ -886,8 +883,7 @@ inline float Dot(const Normal &n1, const Normal &n2)
 {
     Assert(!n1.HasNaNs() && !n2.HasNaNs());
 #ifdef USE_SIMD_AVX
-    return _mm_cvtss_f32(_mm_dp_ps(n1._vec, n2._vec, 0x71));
-    //return n1.x * n2.x + n1.y * n2.y + n1.z * n2.z;
+    return _mm_cvtss_f32(_mm_dp_ps(n1.vec, n2.vec, 0x71));
 #else
     return n1.x * n2.x + n1.y * n2.y + n1.z * n2.z;
 #endif

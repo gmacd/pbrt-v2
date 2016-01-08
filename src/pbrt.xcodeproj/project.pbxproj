@@ -252,7 +252,7 @@
 		BF83A6CD1C3F2697002CAC06 /* fileutil.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B130248C1236EE5100206AC7 /* fileutil.cpp */; };
 		BF83A6D71C3F26B8002CAC06 /* tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF83A6301C3DD6E9002CAC06 /* tests.cpp */; };
 		BF83A6DB1C3F27BA002CAC06 /* geometry_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF83A6331C3DD705002CAC06 /* geometry_tests.cpp */; };
-		BF83A6DC1C3F27BA002CAC06 /* scratch_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF83A6341C3DD705002CAC06 /* scratch_tests.cpp */; };
+		BF83A6DC1C3F27BA002CAC06 /* alignment_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF83A6341C3DD705002CAC06 /* alignment_tests.cpp */; };
 		BF83A6DD1C3F27BA002CAC06 /* transform_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BF83A6351C3DD705002CAC06 /* transform_tests.cpp */; };
 /* End PBXBuildFile section */
 
@@ -577,9 +577,8 @@
 		BF7003A21C32B8BE00F3D698 /* tinyexr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tinyexr.h; path = 3rdparty/tinyexr.h; sourceTree = "<group>"; };
 		BF83A6301C3DD6E9002CAC06 /* tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tests.cpp; sourceTree = "<group>"; };
 		BF83A6331C3DD705002CAC06 /* geometry_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = geometry_tests.cpp; path = tests/geometry_tests.cpp; sourceTree = "<group>"; };
-		BF83A6341C3DD705002CAC06 /* scratch_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scratch_tests.cpp; path = tests/scratch_tests.cpp; sourceTree = "<group>"; };
+		BF83A6341C3DD705002CAC06 /* alignment_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = alignment_tests.cpp; path = tests/alignment_tests.cpp; sourceTree = "<group>"; };
 		BF83A6351C3DD705002CAC06 /* transform_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = transform_tests.cpp; path = tests/transform_tests.cpp; sourceTree = "<group>"; };
-		BF83A64C1C3F2683002CAC06 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		BF83A6D61C3F2697002CAC06 /* pbrt tests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "pbrt tests"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -606,7 +605,6 @@
 			children = (
 				08FB7795FE84155DC02AAC07 /* Source */,
 				C6859E8C029090F304C91782 /* Documentation */,
-				BF83A64B1C3F2683002CAC06 /* prbt-tests */,
 				1AB674ADFE9D54B511CA2CBB /* Products */,
 			);
 			name = pbrt;
@@ -1005,18 +1003,10 @@
 			isa = PBXGroup;
 			children = (
 				BF83A6331C3DD705002CAC06 /* geometry_tests.cpp */,
-				BF83A6341C3DD705002CAC06 /* scratch_tests.cpp */,
+				BF83A6341C3DD705002CAC06 /* alignment_tests.cpp */,
 				BF83A6351C3DD705002CAC06 /* transform_tests.cpp */,
 			);
 			name = tests;
-			sourceTree = "<group>";
-		};
-		BF83A64B1C3F2683002CAC06 /* prbt-tests */ = {
-			isa = PBXGroup;
-			children = (
-				BF83A64C1C3F2683002CAC06 /* main.cpp */,
-			);
-			path = "prbt-tests";
 			sourceTree = "<group>";
 		};
 		C6859E8C029090F304C91782 /* Documentation */ = {
@@ -1229,7 +1219,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BF83A6DB1C3F27BA002CAC06 /* geometry_tests.cpp in Sources */,
-				BF83A6DC1C3F27BA002CAC06 /* scratch_tests.cpp in Sources */,
+				BF83A6DC1C3F27BA002CAC06 /* alignment_tests.cpp in Sources */,
 				BF83A6DD1C3F27BA002CAC06 /* transform_tests.cpp in Sources */,
 				BF83A6D71C3F26B8002CAC06 /* tests.cpp in Sources */,
 				BF83A6541C3F2697002CAC06 /* bvh.cpp in Sources */,
