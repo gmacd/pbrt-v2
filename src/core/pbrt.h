@@ -131,7 +131,7 @@ class Timer;
 class ProgressReporter;
 class MemoryArena;
 template <typename T, int logBlockSize = 2> class BlockedArray;
-struct Matrix4x4;
+class Matrix4x4;
 class Mutex;
 class RWMutex;
 class Shape;

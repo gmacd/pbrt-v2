@@ -33,9 +33,7 @@
 #include "pbrt.h"
 
 
-class
-__attribute__ ((aligned(16)))
-Vector
+class alignas(16) Vector
 {
 public:
     union
@@ -213,9 +211,7 @@ public:
 };
 
 
-class
-__attribute__ ((aligned(16)))
-Point
+class alignas(16) Point
 {
 public:
     union
@@ -357,9 +353,7 @@ public:
 };
 
 
-class
-__attribute__ ((aligned(16)))
-Normal
+class alignas(16) Normal
 {
 public:
     union

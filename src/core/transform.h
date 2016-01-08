@@ -38,9 +38,7 @@
 #include "quaternion.h"
 
 // Matrix4x4 Declarations
-class
-__attribute__ ((aligned(16)))
-Matrix4x4
+class alignas(16) Matrix4x4
 {
 public:
     union
