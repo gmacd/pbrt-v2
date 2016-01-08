@@ -359,15 +359,15 @@ public:
 
 
 class
-//__attribute__ ((aligned(16)))
+__attribute__ ((aligned(16)))
 Normal
 {
 public:
-    /*union
+    union
     {
-    struct {*/ float x, y, z; /*};
+        struct { float x, y, z; };
         float4_t _vec;
-        };*/
+    };
 
     
     Normal()
@@ -498,9 +498,7 @@ public:
 };
 
 
-class
-//__attribute__ ((aligned(16)))
-Ray
+class Ray
 {
 public:
     Point o;
@@ -543,9 +541,7 @@ public:
 };
 
 
-class
-//__attribute__ ((aligned(16)))
-RayDifferential :
+class RayDifferential :
     public Ray
 {
 public:
@@ -597,9 +593,7 @@ public:
 };
 
 
-class
-//__attribute__ ((aligned(16)))
-BBox
+class BBox
 {
 public:
     Point pMin, pMax;
@@ -746,7 +740,11 @@ inline Vector operator*(float f, const Vector &v)
 inline float Dot(const Vector &v1, const Vector &v2)
 {
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
+#ifdef USE_SIMD_AVX
+    return _mm_cvtss_f32(_mm_dp_ps(v1._vec, v2._vec, 0x71));
+#else
     return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+#endif
 }
 
 
@@ -756,37 +754,57 @@ inline float AbsDot(const Vector &v1, const Vector &v2)
     return fabsf(Dot(v1, v2));
 }
 
+inline __m128 Cross(const __m128* v1, const __m128* v2)
+{
+    return _mm_sub_ps(
+        _mm_mul_ps(_mm_shuffle_ps(*v1, *v1, _MM_SHUFFLE(3, 0, 2, 1)),
+                   _mm_shuffle_ps(*v2, *v2, _MM_SHUFFLE(3, 1, 0, 2))),
+        _mm_mul_ps(_mm_shuffle_ps(*v1, *v1, _MM_SHUFFLE(3, 1, 0, 2)),
+                   _mm_shuffle_ps(*v2, *v2, _MM_SHUFFLE(3, 0, 2, 1))));
+}
 
 inline Vector Cross(const Vector &v1, const Vector &v2)
 {
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
+#ifdef USE_SIMD_AVX
+    return Cross(&v1._vec, &v2._vec);
+#else
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
     return Vector((v1y * v2z) - (v1z * v2y),
                   (v1z * v2x) - (v1x * v2z),
                   (v1x * v2y) - (v1y * v2x));
+#endif
 }
 
 
 inline Vector Cross(const Vector &v1, const Normal &v2)
 {
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
+#ifdef USE_SIMD_AVX
+    return Cross(&v1._vec, &v2._vec);
+#else
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
     return Vector((v1y * v2z) - (v1z * v2y),
                   (v1z * v2x) - (v1x * v2z),
                   (v1x * v2y) - (v1y * v2x));
+#endif
 }
 
 
 inline Vector Cross(const Normal &v1, const Vector &v2)
 {
     Assert(!v1.HasNaNs() && !v2.HasNaNs());
+#ifdef USE_SIMD_AVX
+    return Cross(&v1._vec, &v2._vec);
+#else
     double v1x = v1.x, v1y = v1.y, v1z = v1.z;
     double v2x = v2.x, v2y = v2.y, v2z = v2.z;
     return Vector((v1y * v2z) - (v1z * v2y),
                   (v1z * v2x) - (v1x * v2z),
                   (v1x * v2y) - (v1y * v2x));
+#endif
 }
 
 
@@ -843,42 +861,57 @@ inline Normal Normalize(const Normal &n)
 inline float Dot(const Normal &n1, const Vector &v2)
 {
     Assert(!n1.HasNaNs() && !v2.HasNaNs());
+#ifdef USE_SIMD_AVX
+    return _mm_cvtss_f32(_mm_dp_ps(n1._vec, v2._vec, 0x71));
+    //return n1.x * v2.x + n1.y * v2.y + n1.z * v2.z;
+#else
     return n1.x * v2.x + n1.y * v2.y + n1.z * v2.z;
+#endif
 }
 
 
 inline float Dot(const Vector &v1, const Normal &n2)
 {
     Assert(!v1.HasNaNs() && !n2.HasNaNs());
+#ifdef USE_SIMD_AVX
+    return _mm_cvtss_f32(_mm_dp_ps(v1._vec, n2._vec, 0x71));
+    //return v1.x * n2.x + v1.y * n2.y + v1.z * n2.z;
+#else
     return v1.x * n2.x + v1.y * n2.y + v1.z * n2.z;
+#endif
 }
 
 
 inline float Dot(const Normal &n1, const Normal &n2)
 {
     Assert(!n1.HasNaNs() && !n2.HasNaNs());
+#ifdef USE_SIMD_AVX
+    return _mm_cvtss_f32(_mm_dp_ps(n1._vec, n2._vec, 0x71));
+    //return n1.x * n2.x + n1.y * n2.y + n1.z * n2.z;
+#else
     return n1.x * n2.x + n1.y * n2.y + n1.z * n2.z;
+#endif
 }
 
 
 inline float AbsDot(const Normal &n1, const Vector &v2)
 {
     Assert(!n1.HasNaNs() && !v2.HasNaNs());
-    return fabsf(n1.x * v2.x + n1.y * v2.y + n1.z * v2.z);
+    return fabsf(Dot(n1, v2));
 }
 
 
 inline float AbsDot(const Vector &v1, const Normal &n2)
 {
     Assert(!v1.HasNaNs() && !n2.HasNaNs());
-    return fabsf(v1.x * n2.x + v1.y * n2.y + v1.z * n2.z);
+    return fabsf(Dot(v1, n2));
 }
 
 
 inline float AbsDot(const Normal &n1, const Normal &n2)
 {
     Assert(!n1.HasNaNs() && !n2.HasNaNs());
-    return fabsf(n1.x * n2.x + n1.y * n2.y + n1.z * n2.z);
+    return fabsf(Dot(n1, n2));
 }
 
 

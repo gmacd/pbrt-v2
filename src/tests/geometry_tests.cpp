@@ -44,10 +44,25 @@ TEST_CASE("Length", "[vector]")
 TEST_CASE("Basic BBox ops", "[bbox]")
 {
     BBox b(Point(1, 2, 3), Point(4, 5, 6));
-    REQUIRE(b.pMin.x == 1);
-    REQUIRE(b.pMin.y == 2);
-    REQUIRE(b.pMin.z == 3);
-    REQUIRE(b.pMax.x == 4);
-    REQUIRE(b.pMax.y == 5);
-    REQUIRE(b.pMax.z == 6);
+    CHECK(b.pMin.x == 1);
+    CHECK(b.pMin.y == 2);
+    CHECK(b.pMin.z == 3);
+    CHECK(b.pMax.x == 4);
+    CHECK(b.pMax.y == 5);
+    CHECK(b.pMax.z == 6);
+}
+
+TEST_CASE("DotProduct", "[geom]")
+{
+    auto dp = Dot(Vector(1, 2, 3), Vector(0, 0, 0));
+    CHECK(dp == 0);
+
+    dp = Dot(Vector(1, 2, 3), Vector(10, 20, 30));
+    CHECK(dp == 140);
+
+    dp = Dot(Vector(1, 2, 3), Vector(-10, -20, -30));
+    CHECK(dp == -140);
+
+    dp = AbsDot(Vector(1, 2, 3), Vector(-10, -20, -30));
+    CHECK(dp == 140);
 }
