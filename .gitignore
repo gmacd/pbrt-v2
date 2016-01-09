@@ -33,3 +33,7 @@ lib/
 # Xcode folders
 src/pbrt.xcodeproj/project.xcworkspace/
 src/pbrt.xcodeproj/xcuserdata/
+pbrt-scenes/
+src/pbrt.vs2015/x64/
+*.opendb
+*.VC.db
