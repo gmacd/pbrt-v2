@@ -58,8 +58,8 @@ public:
     void AddInt(const string &, const int *, int nItems);
     void AddBool(const string &, const bool *, int nItems);
     void AddPoint(const string &, const Point3 *, int nItems);
-    void AddVector(const string &, const Vector *, int nItems);
-    void AddNormal(const string &, const Normal *, int nItems);
+    void AddVector(const string &, const Vector3 *, int nItems);
+    void AddNormal(const string &, const Normal3 *, int nItems);
     void AddString(const string &, const string *, int nItems);
     void AddTexture(const string &, const string &);
     void AddRGBSpectrum(const string &, const float *, int nItems);
@@ -80,8 +80,8 @@ public:
     int FindOneInt(const string &, int d) const;
     bool FindOneBool(const string &, bool d) const;
     Point3 FindOnePoint(const string &, const Point3 &d) const;
-    Vector FindOneVector(const string &, const Vector &d) const;
-    Normal FindOneNormal(const string &, const Normal &d) const;
+    Vector3 FindOneVector(const string &, const Vector3 &d) const;
+    Normal3 FindOneNormal(const string &, const Normal3 &d) const;
     Spectrum FindOneSpectrum(const string &,
                              const Spectrum &d) const;
     string FindOneString(const string &, const string &d) const;
@@ -91,8 +91,8 @@ public:
     const int *FindInt(const string &, int *nItems) const;
     const bool *FindBool(const string &, int *nItems) const;
     const Point3 *FindPoint(const string &, int *nItems) const;
-    const Vector *FindVector(const string &, int *nItems) const;
-    const Normal *FindNormal(const string &, int *nItems) const;
+    const Vector3 *FindVector(const string &, int *nItems) const;
+    const Normal3 *FindNormal(const string &, int *nItems) const;
     const Spectrum *FindSpectrum(const string &, int *nItems) const;
     const string *FindString(const string &, int *nItems) const;
     void ReportUnused() const;
@@ -105,8 +105,8 @@ private:
     vector<Reference<ParamSetItem<int> > > ints;
     vector<Reference<ParamSetItem<float> > > floats;
     vector<Reference<ParamSetItem<Point3> > > points;
-    vector<Reference<ParamSetItem<Vector> > > vectors;
-    vector<Reference<ParamSetItem<Normal> > > normals;
+    vector<Reference<ParamSetItem<Vector3> > > vectors;
+    vector<Reference<ParamSetItem<Normal3> > > normals;
     vector<Reference<ParamSetItem<Spectrum> > > spectra;
     vector<Reference<ParamSetItem<string> > > strings;
     vector<Reference<ParamSetItem<string> > > textures;
@@ -175,10 +175,10 @@ public:
     Point3 FindPoint(const string &n, const Point3 &d) const {
            return geomParams.FindOnePoint(n, materialParams.FindOnePoint(n, d));
     }
-    Vector FindVector(const string &n, const Vector &d) const {
+    Vector3 FindVector(const string &n, const Vector3 &d) const {
            return geomParams.FindOneVector(n, materialParams.FindOneVector(n, d));
     }
-    Normal FindNormal(const string &n, const Normal &d) const {
+    Normal3 FindNormal(const string &n, const Normal3 &d) const {
            return geomParams.FindOneNormal(n, materialParams.FindOneNormal(n, d));
     }
     Spectrum FindSpectrum(const string &n, const Spectrum &d) const {

@@ -47,7 +47,7 @@ ExponentialDensity *CreateExponentialVolumeRegion(const Transform &volume2world,
     Point p1 = Point(params.FindOnePoint("p1", Point3(1,1,1)));
     float a = params.FindOneFloat("a", 1.);
     float b = params.FindOneFloat("b", 1.);
-    Vector up = params.FindOneVector("updir", Vector(0,1,0));
+    Vector up = Vector(params.FindOneVector("updir", Vector3(0,1,0)));
     return new ExponentialDensity(sigma_a, sigma_s, g, Le, BBox(p0, p1),
         volume2world, a, b, up);
 }

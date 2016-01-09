@@ -47,7 +47,7 @@ public:
     // TriangleMesh Public Methods
     TriangleMesh(const Transform *o2w, const Transform *w2o, bool ro,
                  int ntris, int nverts, const int *vptr,
-                 const Point3 *pts, const Normal *N, const Vector *S,
+                 const Point3 *pts, const Normal3 *N, const Vector3 *S,
                  const float *uv, const Reference<Texture<float> > &atex);
     ~TriangleMesh();
     BBox ObjectBound() const;

@@ -41,9 +41,10 @@
 // TriangleMesh Method Definitions
 TriangleMesh::TriangleMesh(const Transform *o2w, const Transform *w2o,
         bool ro, int nt, int nv, const int *vi, const Point3 *pts,
-        const Normal *N, const Vector *S, const float *uv,
+        const Normal3 *N, const Vector3 *S, const float *uv,
         const Reference<Texture<float> > &atex)
-    : Shape(o2w, w2o, ro), alphaTexture(atex) {
+    : Shape(o2w, w2o, ro), alphaTexture(atex)
+{
     ntris = nt;
     nverts = nv;
     vertexIndex = new int[3 * ntris];
@@ -57,7 +58,8 @@ TriangleMesh::TriangleMesh(const Transform *o2w, const Transform *w2o,
     p = new Point[nverts];
     if (N) {
         n = new Normal[nverts];
-        memcpy(n, N, nverts*sizeof(Normal));
+		for (auto i = 0; i < nverts; i++)
+			n[i] = Normal(N[i]);
     }
     else n = NULL;
     if (S) {
@@ -392,12 +394,12 @@ TriangleMesh *CreateTriangleMeshShape(const Transform *o2w, const Transform *w2o
     if (!vi || !pts)
         return NULL;
     
-    const Vector *S = params.FindVector("S", &nsi);
+    const Vector3 *S = params.FindVector("S", &nsi);
     if (S && nsi != npi) {
         Error("Number of \"S\"s for triangle mesh must match \"P\"s");
         S = NULL;
     }
-    const Normal *N = params.FindNormal("N", &nni);
+    const Normal3 *N = params.FindNormal("N", &nni);
     if (N && nni != npi) {
         Error("Number of \"N\"s for triangle mesh must match \"P\"s");
         N = NULL;

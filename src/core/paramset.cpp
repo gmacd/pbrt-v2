@@ -82,15 +82,15 @@ void ParamSet::AddPoint(const string &name, const Point3 *data, int nItems) {
 }
 
 
-void ParamSet::AddVector(const string &name, const Vector *data, int nItems) {
+void ParamSet::AddVector(const string &name, const Vector3 *data, int nItems) {
     EraseVector(name);
-    ADD_PARAM_TYPE(Vector, vectors);
+    ADD_PARAM_TYPE(Vector3, vectors);
 }
 
 
-void ParamSet::AddNormal(const string &name, const Normal *data, int nItems) {
+void ParamSet::AddNormal(const string &name, const Normal3 *data, int nItems) {
     EraseNormal(name);
-    ADD_PARAM_TYPE(Normal, normals);
+    ADD_PARAM_TYPE(Normal3, normals);
 }
 
 
@@ -341,22 +341,22 @@ Point3 ParamSet::FindOnePoint(const string &name, const Point3 &d) const {
 }
 
 
-const Vector *ParamSet::FindVector(const string &name, int *nItems) const {
+const Vector3 *ParamSet::FindVector(const string &name, int *nItems) const {
     LOOKUP_PTR(vectors);
 }
 
 
-Vector ParamSet::FindOneVector(const string &name, const Vector &d) const {
+Vector3 ParamSet::FindOneVector(const string &name, const Vector3 &d) const {
     LOOKUP_ONE(vectors);
 }
 
 
-const Normal *ParamSet::FindNormal(const string &name, int *nItems) const {
+const Normal3 *ParamSet::FindNormal(const string &name, int *nItems) const {
     LOOKUP_PTR(normals);
 }
 
 
-Normal ParamSet::FindOneNormal(const string &name, const Normal &d) const {
+Normal3 ParamSet::FindOneNormal(const string &name, const Normal3 &d) const {
     LOOKUP_ONE(normals);
 }
 
@@ -503,7 +503,7 @@ string ParamSet::ToString() const {
     for (i = 0; i < vectors.size(); ++i) {
         char *bufp = buf;
         *bufp = '\0';
-        const Reference<ParamSetItem<Vector> > &item = vectors[i];
+        const Reference<ParamSetItem<Vector3> > &item = vectors[i];
         typeString = "vector ";
         // Print _ParamSetItem_ declaration, determine how many to print
         int nPrint = item->nItems;
@@ -521,7 +521,7 @@ string ParamSet::ToString() const {
     for (i = 0; i < normals.size(); ++i) {
         char *bufp = buf;
         *bufp = '\0';
-        const Reference<ParamSetItem<Normal> > &item = normals[i];
+        const Reference<ParamSetItem<Normal3> > &item = normals[i];
         typeString = "normal ";
         // Print _ParamSetItem_ declaration, determine how many to print
         int nPrint = item->nItems;

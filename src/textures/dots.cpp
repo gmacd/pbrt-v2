@@ -49,11 +49,16 @@ DotsTexture<float> *CreateDotsFloatTexture(const Transform &tex2world,
     }
     else if (type == "spherical") map = new SphericalMapping2D(Inverse(tex2world));
     else if (type == "cylindrical") map = new CylindricalMapping2D(Inverse(tex2world));
-    else if (type == "planar")
-        map = new PlanarMapping2D(tp.FindVector("v1", Vector(1,0,0)),
-            tp.FindVector("v2", Vector(0,1,0)),
-            tp.FindFloat("udelta", 0.f), tp.FindFloat("vdelta", 0.f));
-    else {
+	else if (type == "planar")
+	{
+		map = new PlanarMapping2D(
+			Vector(tp.FindVector("v1", Vector3(1, 0, 0))),
+			Vector(tp.FindVector("v2", Vector3(0, 1, 0))),
+			tp.FindFloat("udelta", 0.f),
+			tp.FindFloat("vdelta", 0.f));
+	}
+    else
+	{
         Error("2D texture mapping \"%s\" unknown", type.c_str());
         map = new UVMapping2D;
     }
@@ -78,11 +83,16 @@ DotsTexture<Spectrum> *CreateDotsSpectrumTexture(const Transform &tex2world,
     }
     else if (type == "spherical") map = new SphericalMapping2D(Inverse(tex2world));
     else if (type == "cylindrical") map = new CylindricalMapping2D(Inverse(tex2world));
-    else if (type == "planar")
-        map = new PlanarMapping2D(tp.FindVector("v1", Vector(1,0,0)),
-            tp.FindVector("v2", Vector(0,1,0)),
-            tp.FindFloat("udelta", 0.f), tp.FindFloat("vdelta", 0.f));
-    else {
+	else if (type == "planar")
+	{
+		map = new PlanarMapping2D(
+			Vector(tp.FindVector("v1", Vector3(1, 0, 0))),
+			Vector(tp.FindVector("v2", Vector3(0, 1, 0))),
+			tp.FindFloat("udelta", 0.f),
+			tp.FindFloat("vdelta", 0.f));
+	}
+	else
+	{
         Error("2D texture mapping \"%s\" unknown", type.c_str());
         map = new UVMapping2D;
     }
