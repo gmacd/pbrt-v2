@@ -714,7 +714,20 @@ static void InitParamSet(ParamSet &ps, SpectrumType type) {
                 if ((nItems % 3) != 0)
                     Warning("Excess values given with point parameter \"%s\". "
                             "Ignoring last %d of them", cur_paramlist[i].name, nItems % 3);
-                ps.AddPoint(name, (Point3 *)data, nItems / 3);
+
+                // We expect 3 element (12 byte) points here, but Point is 16 bytes,
+                // so we create a new array of Points, and copy the values.
+                auto numPts = nItems/3;
+                auto pts = new Point[nItems/3];
+                auto ptElem = static_cast<float*>(data);
+                for (auto pti = 0; pti < nItems/3; pti++)
+                {
+                    auto x = *ptElem++;
+                    auto y = *ptElem++;
+                    auto z = *ptElem++;
+                    pts[pti] = Point(x, y, z);
+                }
+                ps.AddPoint(name, pts, numPts);
             } else if (type == PARAM_TYPE_VECTOR) {
                 if ((nItems % 3) != 0)
                     Warning("Excess values given with vector parameter \"%s\". "

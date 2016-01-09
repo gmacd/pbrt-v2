@@ -33,79 +33,6 @@
 #include "pbrt.h"
 
 
-// TODO Merge these into a single 3 component data transfer type
-class Vector3
-{
-public:
-	float x, y, z;
-
-	Vector3()
-	{
-		x = y = z = 0.f;
-	}
-
-	Vector3(float xx, float yy, float zz) :
-		x(xx), y(yy), z(zz)
-	{
-	}
-
-	Vector3(const Vector3 &v)
-	{
-		x = v.x;  y = v.y;  z = v.z;
-	}
-
-	explicit Vector3(const Vector &v);
-};
-
-
-class Point3
-{
-public:
-	float x, y, z;
-
-	Point3()
-	{
-		x = y = z = 0.f;
-	}
-
-	Point3(float xx, float yy, float zz) :
-		x(xx), y(yy), z(zz)
-	{
-	}
-
-	Point3(const Point3 &p)
-	{
-		x = p.x;  y = p.y;  z = p.z;
-	}
-
-	explicit Point3(const Point &p);
-};
-
-
-class Normal3
-{
-public:
-	float x, y, z;
-
-	Normal3()
-	{
-		x = y = z = 0.f;
-	}
-
-	Normal3(float xx, float yy, float zz) :
-		x(xx), y(yy), z(zz)
-	{
-	}
-
-	Normal3(const Normal3 &n)
-	{
-		x = n.x;  y = n.y;  z = n.z;
-	}
-
-	explicit Normal3(const Normal &n);
-};
-
-
 class alignas(16) Vector
 {
 public:
@@ -138,12 +65,6 @@ public:
     {
     }
 
-	explicit Vector(const Vector3& v)
-	{
-		x = v.x;  y = v.y;  z = v.z;
-		Assert(!HasNaNs());
-	}
-    
     explicit Vector(const Point &p);
     explicit Vector(const Normal &n);
 
@@ -292,12 +213,6 @@ public:
         x = p.x;  y = p.y;  z = p.z;
     }
     
-    explicit Point(const Point3 &p)
-    {
-        x = p.x;  y = p.y;  z = p.z;
-        Assert(!HasNaNs());
-    }
-
     
     Point &operator=(const Point &p)
     {
@@ -434,12 +349,6 @@ public:
         x = n.x; y = n.y; z = n.z;
     }
 	
-	explicit Normal(const Normal3& n)
-	{
-		x = n.x;  y = n.y;  z = n.z;
-		Assert(!HasNaNs());
-	}
-
     explicit Normal(const Vector &v):
         x(v.x), y(v.y), z(v.z)
     {
@@ -761,21 +670,6 @@ inline Vector::Vector(const Normal &n):
     x(n.x), y(n.y), z(n.z)
 {
     Assert(!n.HasNaNs());
-}
-
-inline Vector3::Vector3(const Vector& v)
-{
-    x = v.x;  y = v.y;  z = v.z;
-}
-
-inline Point3::Point3(const Point& p)
-{
-	x = p.x;  y = p.y;  z = p.z;
-}
-
-inline Normal3::Normal3(const Normal& n)
-{
-	x = n.x;  y = n.y;  z = n.z;
 }
 
 inline const Point &BBox::operator[](int i) const

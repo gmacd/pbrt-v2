@@ -76,21 +76,21 @@ void ParamSet::AddBool(const string &name, const bool *data, int nItems) {
 }
 
 
-void ParamSet::AddPoint(const string &name, const Point3 *data, int nItems) {
+void ParamSet::AddPoint(const string &name, const Point *data, int nItems) {
     ErasePoint(name);
-    ADD_PARAM_TYPE(Point3, points);
+    ADD_PARAM_TYPE(Point, points);
 }
 
 
-void ParamSet::AddVector(const string &name, const Vector3 *data, int nItems) {
+void ParamSet::AddVector(const string &name, const Vector *data, int nItems) {
     EraseVector(name);
-    ADD_PARAM_TYPE(Vector3, vectors);
+    ADD_PARAM_TYPE(Vector, vectors);
 }
 
 
-void ParamSet::AddNormal(const string &name, const Normal3 *data, int nItems) {
+void ParamSet::AddNormal(const string &name, const Normal *data, int nItems) {
     EraseNormal(name);
-    ADD_PARAM_TYPE(Normal3, normals);
+    ADD_PARAM_TYPE(Normal, normals);
 }
 
 
@@ -331,32 +331,32 @@ bool ParamSet::FindOneBool(const string &name, bool d) const {
 }
 
 
-const Point3 *ParamSet::FindPoint(const string &name, int *nItems) const {
+const Point *ParamSet::FindPoint(const string &name, int *nItems) const {
     LOOKUP_PTR(points);
 }
 
 
-Point3 ParamSet::FindOnePoint(const string &name, const Point3 &d) const {
+Point ParamSet::FindOnePoint(const string &name, const Point &d) const {
     LOOKUP_ONE(points);
 }
 
 
-const Vector3 *ParamSet::FindVector(const string &name, int *nItems) const {
+const Vector *ParamSet::FindVector(const string &name, int *nItems) const {
     LOOKUP_PTR(vectors);
 }
 
 
-Vector3 ParamSet::FindOneVector(const string &name, const Vector3 &d) const {
+Vector ParamSet::FindOneVector(const string &name, const Vector &d) const {
     LOOKUP_ONE(vectors);
 }
 
 
-const Normal3 *ParamSet::FindNormal(const string &name, int *nItems) const {
+const Normal *ParamSet::FindNormal(const string &name, int *nItems) const {
     LOOKUP_PTR(normals);
 }
 
 
-Normal3 ParamSet::FindOneNormal(const string &name, const Normal3 &d) const {
+Normal ParamSet::FindOneNormal(const string &name, const Normal &d) const {
     LOOKUP_ONE(normals);
 }
 
@@ -485,7 +485,7 @@ string ParamSet::ToString() const {
     for (i = 0; i < points.size(); ++i) {
         char *bufp = buf;
         *bufp = '\0';
-        const Reference<ParamSetItem<Point3> > &item = points[i];
+        const Reference<ParamSetItem<Point> > &item = points[i];
         typeString = "point ";
         // Print _ParamSetItem_ declaration, determine how many to print
         int nPrint = item->nItems;
@@ -503,7 +503,7 @@ string ParamSet::ToString() const {
     for (i = 0; i < vectors.size(); ++i) {
         char *bufp = buf;
         *bufp = '\0';
-        const Reference<ParamSetItem<Vector3> > &item = vectors[i];
+        const Reference<ParamSetItem<Vector> > &item = vectors[i];
         typeString = "vector ";
         // Print _ParamSetItem_ declaration, determine how many to print
         int nPrint = item->nItems;
@@ -521,7 +521,7 @@ string ParamSet::ToString() const {
     for (i = 0; i < normals.size(); ++i) {
         char *bufp = buf;
         *bufp = '\0';
-        const Reference<ParamSetItem<Normal3> > &item = normals[i];
+        const Reference<ParamSetItem<Normal> > &item = normals[i];
         typeString = "normal ";
         // Print _ParamSetItem_ declaration, determine how many to print
         int nPrint = item->nItems;

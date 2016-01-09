@@ -155,14 +155,14 @@ inline int SDVertex::valence() {
 // LoopSubdiv Method Definitions
 LoopSubdiv::LoopSubdiv(const Transform *o2w, const Transform *w2o,
                        bool ro, int nfaces, int nvertices,
-                       const int *vertexIndices, const Point3 *pts, int nl)
+                       const int *vertexIndices, const Point *pts, int nl)
     : Shape(o2w, w2o, ro) {
     nLevels = nl;
     // Allocate _LoopSubdiv_ vertices and faces
     int i;
     SDVertex *verts = new SDVertex[nvertices];
     for (i = 0; i < nvertices; ++i) {
-        verts[i] = SDVertex(Point(pts[i]));
+        verts[i] = SDVertex(pts[i]);
         vertices.push_back(&verts[i]);
     }
     SDFace *fs = new SDFace[nfaces];
@@ -370,15 +370,15 @@ void LoopSubdiv::Refine(vector<Reference<Shape> > &refined) const {
         v = newVertices;
     }
     // Push vertices to limit surface
-    Point3 *Plimit = new Point3[v.size()];
+    Point *Plimit = new Point[v.size()];
     for (uint32_t i = 0; i < v.size(); ++i) {
         if (v[i]->boundary)
-            Plimit[i] = Point3(weightBoundary(v[i], 1.f/5.f));
+            Plimit[i] = weightBoundary(v[i], 1.f/5.f);
         else
-            Plimit[i] = Point3(weightOneRing(v[i], gamma(v[i]->valence())));
+            Plimit[i] = weightOneRing(v[i], gamma(v[i]->valence()));
     }
     for (uint32_t i = 0; i < v.size(); ++i)
-        v[i]->P = Point(Plimit[i]);
+        v[i]->P = Plimit[i];
 
     // Compute vertex tangents on limit surface
     vector<Normal> Ns;
@@ -497,7 +497,7 @@ LoopSubdiv *CreateLoopSubdivShape(const Transform *o2w, const Transform *w2o,
     int nlevels = params.FindOneInt("nlevels", 3);
     int nps, nIndices;
     const int *vi = params.FindInt("indices", &nIndices);
-    const Point3 *pts = params.FindPoint("P", &nps);
+    const Point *pts = params.FindPoint("P", &nps);
     if (!vi || !pts) return NULL;
 
     // don't actually use this for now...

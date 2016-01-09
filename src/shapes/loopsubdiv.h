@@ -47,7 +47,7 @@ public:
     // LoopSubdiv Public Methods
     LoopSubdiv(const Transform *o2w, const Transform *w2o, bool ro,
                int nt, int nv, const int *vi,
-               const Point3 *pts, int nlevels);
+               const Point *pts, int nlevels);
     ~LoopSubdiv();
     bool CanIntersect() const;
     void Refine(vector<Reference<Shape> > &refined) const;

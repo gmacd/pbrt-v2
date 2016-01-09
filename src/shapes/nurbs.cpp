@@ -231,7 +231,7 @@ void NURBS::Refine(vector<Reference<Shape> > &refined) const {
     int diceu = 30, dicev = 30;
     float *ueval = new float[diceu];
     float *veval = new float[dicev];
-    Point3 *evalPs = new Point3[diceu*dicev];
+    Point *evalPs = new Point[diceu*dicev];
     Normal *evalNs = new Normal[diceu*dicev];
     int i;
     for (i = 0; i < diceu; ++i)

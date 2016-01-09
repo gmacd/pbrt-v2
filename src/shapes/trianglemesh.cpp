@@ -40,8 +40,8 @@
 
 // TriangleMesh Method Definitions
 TriangleMesh::TriangleMesh(const Transform *o2w, const Transform *w2o,
-        bool ro, int nt, int nv, const int *vi, const Point3 *pts,
-        const Normal3 *N, const Vector3 *S, const float *uv,
+        bool ro, int nt, int nv, const int *vi, const Point *pts,
+        const Normal *N, const Vector *S, const float *uv,
         const Reference<Texture<float> > &atex)
     : Shape(o2w, w2o, ro), alphaTexture(atex)
 {
@@ -69,9 +69,8 @@ TriangleMesh::TriangleMesh(const Transform *o2w, const Transform *w2o,
     else s = NULL;
 
     // Transform mesh vertices to world space
-    // (Converting from Point3 to Point)
     for (int i = 0; i < nverts; ++i)
-        p[i] = (*ObjectToWorld)(Point(pts[i]));
+        p[i] = (*ObjectToWorld)(pts[i]);
 }
 
 
@@ -376,7 +375,7 @@ TriangleMesh *CreateTriangleMeshShape(const Transform *o2w, const Transform *w2o
         map<string, Reference<Texture<float> > > *floatTextures) {
     int nvi, npi, nuvi, nsi, nni;
     const int *vi = params.FindInt("indices", &nvi);
-    const Point3 *pts = params.FindPoint("P", &npi);
+    const Point *pts = params.FindPoint("P", &npi);
     const float *uvs = params.FindFloat("uv", &nuvi);
     if (!uvs) uvs = params.FindFloat("st", &nuvi);
     bool discardDegnerateUVs = params.FindOneBool("discarddegenerateUVs", false);
@@ -394,12 +393,12 @@ TriangleMesh *CreateTriangleMeshShape(const Transform *o2w, const Transform *w2o
     if (!vi || !pts)
         return NULL;
     
-    const Vector3 *S = params.FindVector("S", &nsi);
+    const Vector *S = params.FindVector("S", &nsi);
     if (S && nsi != npi) {
         Error("Number of \"S\"s for triangle mesh must match \"P\"s");
         S = NULL;
     }
-    const Normal3 *N = params.FindNormal("N", &nni);
+    const Normal *N = params.FindNormal("N", &nni);
     if (N && nni != npi) {
         Error("Number of \"N\"s for triangle mesh must match \"P\"s");
         N = NULL;
@@ -409,9 +408,9 @@ TriangleMesh *CreateTriangleMeshShape(const Transform *o2w, const Transform *w2o
         // give degenerate mappings; discard them if so
         const int *vp = vi;
         for (int i = 0; i < nvi; i += 3, vp += 3) {
-            Point p0(pts[vp[0]]);
-            Point p1(pts[vp[1]]);
-            Point p2(pts[vp[2]]);
+            const Point& p0 = pts[vp[0]];
+            const Point& p1 = pts[vp[1]];
+            const Point& p2 = pts[vp[2]];
             float area = .5f * Cross(p0-p1, p2-p1).Length();
             if (area < 1e-7)
                 continue; // ignore degenerate tris.
